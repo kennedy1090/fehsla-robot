@@ -1,0 +1,2 @@
+   text	   data	    bss	    dec	    hex	filename
+  32456	   3420	   5552	  41428	   a1d4	../fehsla-robot.elf

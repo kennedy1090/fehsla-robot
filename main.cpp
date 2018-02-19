@@ -2,6 +2,7 @@
 #include <FEHIO.h>
 #include <FEHUtility.h>
 
+#include "tests.h"
 int main(void)
 {
 
@@ -9,14 +10,6 @@ int main(void)
 
     LCD.Clear( FEHLCD::Black );
     LCD.SetFontColor( FEHLCD::White );
-
-    while( true )
-    {
-        if( LCD.Touch(&x,&y) )
-        {
-            LCD.WriteLine( "Hello World!" );
-            Sleep( 100 );
-        }
-    }
-    return 0;
+    AnalogInputPin cds(FEHIO::P0_0);
+    Tests::testPin(cds);
 }

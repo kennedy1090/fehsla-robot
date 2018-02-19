@@ -2,6 +2,7 @@
 #define ROBOT_H
 
 #include <FEHMotor.h>
+#include <FEHRPS.h>
 #include <stdlib.h>
 #include <FEHIO.h>
 #include <math.h>
@@ -16,16 +17,15 @@ class Robot
 {
 public:
     Robot();
-    const float countsPerInch;
-    const float radius;
     //Angles are in radians
-    void moveAtAngle(float angle, int percent);
-    void turn(float angle);
+    void moveAtAngle(float angle, float percent);
+    void turn(float angle, float percent);
     void moveToPosition(Point pos, float percent);
     void stopAll();
     void updateLocation();
     //Assumes counts have been reset before moving
-    bool atLocationDR();
+    bool atAngle(float angle);
+    bool atLocation(Point p);
     void setMotor(Motors m, float percent);
     void stop(Motors m);
 private:
@@ -35,11 +35,6 @@ private:
     FEHMotor bottom;
     Point currentLocation;
     float currentAngle;
-    //-1 if motors are running in a negative direction
-    //1 if motors are running in a positive direction
-    char dirs[4];
-    DigitalEncoder rCounts, lCounts;
-    DigitalEncoder tCounts, bCounts;
 };
 
 #endif // ROBOT_H
