@@ -5,11 +5,13 @@
 #include "tests.h"
 int main(void)
 {
-
-    float x,y;
-
+    int motor_power = 50;
     LCD.Clear( FEHLCD::Black );
     LCD.SetFontColor( FEHLCD::White );
-    AnalogInputPin cds(FEHIO::P0_0);
-    Tests::testPin(cds);
+    LCD.Write("Motor power: ");
+    LCD.WriteLine(motor_power);
+    Robot r;
+    r.moveAtAngle(PI/4, motor_power);
+    r.waitFor(3);
+    r.stopAll();
 }

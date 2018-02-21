@@ -2,14 +2,17 @@
 
 inline float wrapAngle( float angle )
 {
-    double twoPi = 2.0 * 3.141592865358979;
+    double twoPi = 2.0 * PI;
     return angle - twoPi * floor( angle / twoPi );
 }
 
-Robot::Robot() : right(FEHMotor::Motor0, 7.2), top(FEHMotor::Motor1, 7.2), left(FEHMotor::Motor2, 7.2), bottom(FEHMotor::Motor3, 7.2)
+Robot::Robot() :
+    right(FEHMotor::Motor0, 7.2), top(FEHMotor::Motor1, 7.2),
+    left(FEHMotor::Motor2, 7.2), bottom(FEHMotor::Motor3, 7.2),
+    killswitch(KILLSWITCH_PIN), cds(CDS_PIN)
 {
-    currentLocation = {RPS.X(), RPS.Y()};
-    currentAngle = RPS.Heading() * 3.14159265 / 180;
+    currentLocation = {0, 0};
+    currentAngle = 0;
 }
 
 void Robot::moveToPosition(Point pos, float percent) {
@@ -80,13 +83,45 @@ void Robot::stop(Motors m) {
     }
 }
 
-//Currently this returns true within 1 inch of location
-bool Robot::atLocation(Point location) {
-    bool b = abs(currentLocation.x - location.x) < 1;
-    b &= abs(currentLocation.y - location.y) < 1;
-    return b;
-}
-bool Robot::atAngle(float angle) {
-    return abs(currentAngle - angle) < 0.2;
+/*
+ * Waits until the robot is within POSITION_TOLERANCE inches of location.
+ */
+void Robot::waitForLocation(Point location) {
+    while(killswitch.Value()
+            && abs(currentLocation.x - location.x) > POSITION_TOLERANCE
+            && abs(currentLocation.y - location.y) > POSITION_TOLERANCE) {
+        updateLocation();
+    }
+
 }
 
+/*
+ * Waits until the robot is within ANGLE_TOLERANCE of angle.
+ */
+void Robot::waitForAngle(float angle) {
+    while(killswitch.Value() && abs(currentAngle - angle) > ANGLE_TOLERANCE) {
+        updateLocation();
+    }
+}
+/*
+ * Waits for the analog input pin to be less than or greater than the given threshold.
+ * Also listens for the killswitch.
+ * (pin.Value() < threshold) == lessThan    <--   True if they're both true or both false
+ *
+ * pin:  The pin to listen for
+ * threshold: The threshold to cross
+ * lessThan:  If it's  true, returns when pin is  less than threshold, otherwise
+ *              returns when pin is greater than threshold.
+ */
+void Robot::waitForPin(AnalogInputPin pin, float threshold, bool lessThan) {
+    while(killswitch.Value() && ((pin.Value() < threshold) == lessThan));
+}
+
+void Robot::waitForPin(DigitalInputPin pin, bool value) {
+    while(killswitch.Value() && pin.Value() != value);
+}
+
+void Robot::waitFor(float time) {
+    float startTime = TimeNow();
+    while(killswitch.Value() && TimeNow() - startTime < time);
+}
