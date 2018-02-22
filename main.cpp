@@ -11,7 +11,15 @@ int main(void)
     LCD.Write("Motor power: ");
     LCD.WriteLine(motor_power);
     Robot r;
-    r.moveAtAngle(PI/4, motor_power);
+    r.moveAtAngle(0.558505, motor_power);
     r.waitFor(3);
+    r.stopAll();
+    r.turn(1.5707963, motor_power);
+    r.stopAll();
+    r.moveAtAngle(PI, motor_power);
+    r.waitFor(2);
+    r.stopAll();
+    r.moveAtAngle(0, motor_power);
+    r.waitFor(2);
     r.stopAll();
 }
