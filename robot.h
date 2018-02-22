@@ -46,6 +46,8 @@ private:
     DigitalInputPin killswitch;
     AnalogInputPin cds;
 
+    bool kill = false;
+
     FEHMotor right;
     FEHMotor left;
     FEHMotor top;
