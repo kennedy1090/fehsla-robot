@@ -10,6 +10,7 @@ int main(void)
     LCD.SetFontColor( FEHLCD::White );
     LCD.Write("Motor power: ");
     LCD.WriteLine(motor_power);
+    //test
     Robot r;
     r.moveAtAngle(0.558505, motor_power);
     r.waitFor(3);
