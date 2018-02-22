@@ -10,8 +10,6 @@ int main(void)
     LCD.SetFontColor( FEHLCD::White );
     LCD.Write("Motor power: ");
     LCD.WriteLine(motor_power);
-    Robot r;
-    r.moveAtAngle(PI/4, motor_power);
-    r.waitFor(3);
-    r.stopAll();
+    AnalogInputPin cds(FEHIO::P0_0);
+    Tests::testPin(cds);
 }
