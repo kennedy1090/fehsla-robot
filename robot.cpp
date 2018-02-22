@@ -16,6 +16,7 @@ Robot::Robot() :
 }
 
 void Robot::moveToPosition(Point pos, float percent) {
+    if(kill)return;
     float angle = atan2(pos.y - currentLocation.y, pos.x - currentLocation.x);
     angle -= currentAngle;
     angle = wrapAngle(angle);
@@ -23,6 +24,7 @@ void Robot::moveToPosition(Point pos, float percent) {
 }
 
 void Robot::moveAtAngle(float angle, float percent) {
+    if(kill)return;
     float vRight = percent * cos(angle);
     float vUp = percent * sin(angle);
     setMotor(TOP, vRight);
@@ -37,6 +39,7 @@ void Robot::stopAll() {
     stop(LEFT);
 }
 void Robot::turn(float angle, float percent) {
+    if(kill)return;
     bool pos = (angle > currentAngle && angle - currentAngle < 3.1415) || (currentAngle > angle && currentAngle - angle  > 3.1415);
     int sign = pos * 2 - 1;
     setMotor(RIGHT, sign * percent);
@@ -46,11 +49,13 @@ void Robot::turn(float angle, float percent) {
 }
 
 void Robot::updateLocation() {
+    if(kill)return;
     currentLocation.x = RPS.X();
     currentLocation.y = RPS.Y();
     currentAngle = RPS.Heading() * 3.1415926535 / 180;
 }
 void Robot::setMotor(Motors m, float percent) {
+    if(kill)return;
     switch(m) {
     case RIGHT:
         right.SetPercent(percent);
@@ -87,10 +92,11 @@ void Robot::stop(Motors m) {
  * Waits until the robot is within POSITION_TOLERANCE inches of location.
  */
 void Robot::waitForLocation(Point location) {
-    while(killswitch.Value()
+    while(!kill
             && abs(currentLocation.x - location.x) > POSITION_TOLERANCE
             && abs(currentLocation.y - location.y) > POSITION_TOLERANCE) {
         updateLocation();
+        if(!killswitch.Value())kill = true;
     }
 
 }
@@ -99,8 +105,9 @@ void Robot::waitForLocation(Point location) {
  * Waits until the robot is within ANGLE_TOLERANCE of angle.
  */
 void Robot::waitForAngle(float angle) {
-    while(killswitch.Value() && abs(currentAngle - angle) > ANGLE_TOLERANCE) {
+    while(!kill && abs(currentAngle - angle) > ANGLE_TOLERANCE) {
         updateLocation();
+        if(!killswitch.Value())kill = true;
     }
 }
 /*
@@ -114,14 +121,17 @@ void Robot::waitForAngle(float angle) {
  *              returns when pin is greater than threshold.
  */
 void Robot::waitForPin(AnalogInputPin pin, float threshold, bool lessThan) {
-    while(killswitch.Value() && ((pin.Value() < threshold) == lessThan));
+    while(!kill && ((pin.Value() < threshold) == lessThan))
+        if(!killswitch.Value())kill = true;
 }
 
 void Robot::waitForPin(DigitalInputPin pin, bool value) {
-    while(killswitch.Value() && pin.Value() != value);
+    while(!kill && pin.Value() != value)
+        if(!killswitch.Value())kill = true;
 }
 
 void Robot::waitFor(float time) {
     float startTime = TimeNow();
-    while(killswitch.Value() && TimeNow() - startTime < time);
+    while(!kill && TimeNow() - startTime < time)
+        if(!killswitch.Value())kill = true;
 }
