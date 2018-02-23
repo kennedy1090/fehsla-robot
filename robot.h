@@ -7,6 +7,7 @@
 #include <FEHIO.h>
 #include <math.h>
 #include <FEHUtility.h>
+#include <FEHLCD.h>
 
 #define PI 3.14159265
 
@@ -42,11 +43,13 @@ public:
     void waitForAngle(float angle);
     void waitForLocation(Point pos);
     void waitFor(float time);
-private:
+
     DigitalInputPin killswitch;
     AnalogInputPin cds;
+private:
 
-    bool kill = false;
+
+    bool kill;
 
     FEHMotor right;
     FEHMotor left;

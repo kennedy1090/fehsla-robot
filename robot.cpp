@@ -9,7 +9,7 @@ inline float wrapAngle( float angle )
 Robot::Robot() :
     right(FEHMotor::Motor0, 7.2), top(FEHMotor::Motor1, 7.2),
     left(FEHMotor::Motor2, 7.2), bottom(FEHMotor::Motor3, 7.2),
-    killswitch(KILLSWITCH_PIN), cds(CDS_PIN)
+    killswitch(KILLSWITCH_PIN), cds(CDS_PIN), kill(false)
 {
     currentLocation = {0, 0};
     currentAngle = 0;
@@ -67,7 +67,7 @@ void Robot::setMotor(Motors m, float percent) {
         bottom.SetPercent(percent);
         break;
     case LEFT:
-        left.SetPercent(percent);
+        left.SetPercent(1.4*percent);
         break;
     }
 }
@@ -113,7 +113,7 @@ void Robot::waitForAngle(float angle) {
 /*
  * Waits for the analog input pin to be less than or greater than the given threshold.
  * Also listens for the killswitch.
- * (pin.Value() < threshold) == lessThan    <--   True if they're both true or both false
+ * (pin.Value() < threshold) != lessThan    <--   True if they're both true or both false
  *
  * pin:  The pin to listen for
  * threshold: The threshold to cross
@@ -121,8 +121,9 @@ void Robot::waitForAngle(float angle) {
  *              returns when pin is greater than threshold.
  */
 void Robot::waitForPin(AnalogInputPin pin, float threshold, bool lessThan) {
-    while(!kill && ((pin.Value() < threshold) == lessThan))
+    while(!kill && ((pin.Value() < threshold) != lessThan)){
         if(!killswitch.Value())kill = true;
+    }
 }
 
 void Robot::waitForPin(DigitalInputPin pin, bool value) {

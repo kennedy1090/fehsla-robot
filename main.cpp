@@ -12,10 +12,11 @@ int main(void)
     LCD.WriteLine(motor_power);
     //test
     Robot r;
-    r.moveAtAngle(0.558505, motor_power);
-    r.waitFor(3);
+    r.waitForPin(r.cds, 1, true);
+    r.moveAtAngle(0.85, motor_power);
+    r.waitFor(4);
     r.stopAll();
-    r.turn(1.5707963, motor_power);
+    r.turn(PI/2-1, motor_power);
     r.stopAll();
     r.moveAtAngle(PI, motor_power);
     r.waitFor(2);
