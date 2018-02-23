@@ -123,6 +123,7 @@ void Robot::waitForAngle(float angle) {
 void Robot::waitForPin(AnalogInputPin pin, float threshold, bool lessThan) {
     while(!kill && ((pin.Value() < threshold) != lessThan)){
         if(!killswitch.Value())kill = true;
+        LCD.WriteAt(pin.Value(), 0, 20);
     }
 }
 

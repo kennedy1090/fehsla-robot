@@ -16,6 +16,9 @@
 //within 1 inch
 #define POSITION_TOLERANCE 1
 
+
+#define RADIANS_PER_SECOND 1.96349540849
+
 #define KILLSWITCH_PIN FEHIO::P1_0
 #define CDS_PIN FEHIO::P0_0
 
