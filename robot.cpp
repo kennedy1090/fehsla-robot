@@ -9,10 +9,17 @@ inline float wrapAngle( float angle )
 Robot::Robot() :
     right(FEHMotor::Motor0, 7.2), top(FEHMotor::Motor1, 7.2),
     left(FEHMotor::Motor2, 7.2), bottom(FEHMotor::Motor3, 7.2),
-    killswitch(KILLSWITCH_PIN), cds(CDS_PIN), kill(false)
+    killswitch(KILLSWITCH_PIN), cds(CDS_PIN), kill(false),
+    servo(FEHServo::Servo0)
 {
-    currentLocation = {0, 0};
-    currentAngle = 0;
+    RPS.InitializeTouchMenu();
+    currentLocation = {RPS.X(),RPS.Y()};
+    currentAngle = RPS.Heading() * PI / 180;
+    servo.SetMin(SERVO_MIN);
+    servo.SetMax(SERVO_MAX);
+    if(DEBUG) {
+        SD.OpenLog();
+    }
 }
 
 void Robot::moveToPosition(Point pos, float percent) {
@@ -50,9 +57,23 @@ void Robot::turn(float angle, float percent) {
 
 void Robot::updateLocation() {
     if(kill)return;
+    float dt = TimeNow() - lastTime;
+    Point locationPrev = currentLocation;
+    float anglePrev = currentAngle;
     currentLocation.x = RPS.X();
     currentLocation.y = RPS.Y();
-    currentAngle = RPS.Heading() * 3.1415926535 / 180;
+    velocity.x = currentLocation.x - locationPrev.x;
+    velocity.x /= dt;
+    velocity.y = currentLocation.y - locationPrev.y;
+    velocity.y /= dt;
+    currentAngle = RPS.Heading() * PI / 180;
+    angularV = currentAngle - anglePrev;
+    angularV /= dt;
+    lastTime = TimeNow();
+    if(DEBUG) {
+        SD.Printf("%.2f: (%.2f, %.2f), %2f\n", TimeNow(),
+                  currentLocation.x, currentLocation.y, currentAngle);
+    }
 }
 void Robot::setMotor(Motors m, float percent) {
     if(kill)return;
@@ -91,23 +112,32 @@ void Robot::stop(Motors m) {
 /*
  * Waits until the robot is within POSITION_TOLERANCE inches of location.
  */
-void Robot::waitForLocation(Point location) {
+void Robot::waitMoveToLocation(Point location, float percent) {
+    float estX = currentLocation.x, estY = currentLocation.y;
     while(!kill
-            && abs(currentLocation.x - location.x) > POSITION_TOLERANCE
-            && abs(currentLocation.y - location.y) > POSITION_TOLERANCE) {
-        updateLocation();
+            && abs(estX - location.x) > POSITION_TOLERANCE
+            && abs(estY - location.y) > POSITION_TOLERANCE) {
         if(!killswitch.Value())kill = true;
-    }
 
+        updateLocation();
+        estX = currentLocation.x + velocity.x * OFFSET_TIME;
+        estY = currentLocation.y + velocity.y * OFFSET_TIME;
+        moveToPosition(location, percent);
+        waitFor(0.1);
+    }
+    stopAll();
 }
 
 /*
  * Waits until the robot is within ANGLE_TOLERANCE of angle.
  */
-void Robot::waitForAngle(float angle) {
-    while(!kill && abs(currentAngle - angle) > ANGLE_TOLERANCE) {
-        updateLocation();
+void Robot::waitMoveToAngle(float angle) {
+    float estAngle = currentAngle;
+    while(!kill && abs(estAngle - angle) > ANGLE_TOLERANCE) {
         if(!killswitch.Value())kill = true;
+
+        updateLocation();
+        estAngle = currentAngle + angularV * OFFSET_TIME;
     }
 }
 /*

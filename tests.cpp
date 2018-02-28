@@ -10,6 +10,7 @@ void Tests::testPin(AnalogInputPin test) {
 }
 
 void Tests::testRPS() {
+    RPS.InitializeTouchMenu();
     while(true) {
         LCD.WriteAt("X: ", 0,0);
         LCD.WriteAt( RPS.X(), 60, 0);
