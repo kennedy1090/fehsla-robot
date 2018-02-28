@@ -10,37 +10,78 @@ int main(void)
     LCD.SetFontColor( FEHLCD::White );
     LCD.Write("Motor power: ");
     LCD.WriteLine(motor_power);
+
     //test
     Robot r;
 
     r.waitForPin(r.cds, 1.2, true);
-    r.moveAtAngle(0.85, motor_power);
-    r.waitFor(3.1);
+    r.moveAtAngle(2.4, 50);
+    r.waitFor(1.42);
     r.stopAll();
-    r.waitFor(0.5);
-    r.moveAtAngle(PI, motor_power);
-    r.waitFor(0.8);
+    Sleep(0.5);
+    r.moveAtAngle(PI, 40);
+    r.waitFor(0.52);
     r.stopAll();
-    r.waitFor(0.5);
-    r.moveAtAngle(0, motor_power);
-    r.waitFor(0.8);
+    Sleep(1);
+
+    if (r.cds.Value() <= 0.55)
+    {
+        LCD.WriteAt(r.cds.Value(), 100, 200);
+        LCD.WriteAt("Red", 100, 150);
+        Sleep(0.5);
+        r.moveAtAngle(0, 40);
+        r.waitFor(0.6);
+        r.stopAll();
+        Sleep(0.5);
+        r.moveAtAngle(PI/2, 40);
+        r.waitFor(0.3);
+        r.stopAll();
+        Sleep(0.5);
+        r.moveAtAngle(3*PI/2, 40);
+        r.waitFor(0.45);
+        r.stopAll();
+        Sleep(0.5);
+        r.moveAtAngle(PI, 40);
+        r.waitFor(0.3);
+        r.stopAll();
+        Sleep(0.5);
+    }
+
+    else if (r.cds.Value() > 0.55)
+    {
+        LCD.WriteAt(r.cds.Value(), 100, 200);
+        LCD.WriteAt("Blue", 100, 150);
+        Sleep(0.5);
+        r.moveAtAngle(PI, 40);
+        r.waitFor(0.6);
+        r.stopAll();
+        Sleep(0.5);
+        r.moveAtAngle(PI/2, 40);
+        r.waitFor(0.3);
+        r.stopAll();
+        Sleep(0.5);
+        r.moveAtAngle(3*PI/2, 40);
+        r.waitFor(0.45);
+        r.stopAll();
+        Sleep(0.5);
+        r.moveAtAngle(0, 50);
+        r.waitFor(0.6);
+    }
+
+    r.moveAtAngle(0, 50);
+    r.waitFor(3);
     r.stopAll();
-    r.waitFor(0.5);
-    r.moveAtAngle(-2.5, motor_power);
-    r.waitFor(2.2);
-    r.moveAtAngle(PI, motor_power);
-    r.waitFor(2.5);
+    Sleep(0.5);
+
+    r.moveAtAngle(PI, 50);
+    r.waitFor(2);
     r.stopAll();
-    r.waitFor(0.5);
-    r.moveAtAngle(PI/2, motor_power);
-    r.waitFor(0.7);
-    r.moveAtAngle(-PI/2, motor_power);
-    r.waitFor(0.7);
-    r.turn(1, motor_power);
-    r.waitFor(0.36);
+    Sleep(0.5);
+
+    r.moveAtAngle(3*PI/2, 50);
+    r.waitFor(1);
     r.stopAll();
-    r.waitFor(0.5);
-    r.moveAtAngle(-2.5, 70);
-    r.waitFor(4);
-    r.stopAll();
+
+    //red range ~ 0.3 - 0.53
+    //blue range ~ 0.53 - 0.95
 }
