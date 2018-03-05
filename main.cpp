@@ -3,85 +3,81 @@
 #include <FEHUtility.h>
 
 #include "tests.h"
+
+#define MAX 2377
+#define MIN 500
+
 int main(void)
 {
-    int motor_power = 50;
-    LCD.Clear( FEHLCD::Black );
-    LCD.SetFontColor( FEHLCD::White );
-    LCD.Write("Motor power: ");
-    LCD.WriteLine(motor_power);
-
-    //test
     Robot r;
+    FEHServo Wrench(FEHServo::Servo0);
 
-    r.waitForPin(r.cds, 1.2, true);
-    r.moveAtAngle(2.4, 50);
-    r.waitFor(1.42);
-    r.stopAll();
-    Sleep(0.5);
-    r.moveAtAngle(PI, 40);
-    r.waitFor(0.52);
-    r.stopAll();
-    Sleep(1);
+    struct Point xy_pos;
 
-    if (r.cds.Value() <= 0.55)
-    {
-        LCD.WriteAt(r.cds.Value(), 100, 200);
-        LCD.WriteAt("Red", 100, 150);
-        Sleep(0.5);
-        r.moveAtAngle(0, 40);
-        r.waitFor(0.6);
-        r.stopAll();
-        Sleep(0.5);
-        r.moveAtAngle(PI/2, 40);
-        r.waitFor(0.3);
-        r.stopAll();
-        Sleep(0.5);
-        r.moveAtAngle(3*PI/2, 40);
-        r.waitFor(0.45);
-        r.stopAll();
-        Sleep(0.5);
-        r.moveAtAngle(PI, 40);
-        r.waitFor(0.3);
-        r.stopAll();
-        Sleep(0.5);
-    }
+    int motor_power = 50;
 
-    else if (r.cds.Value() > 0.55)
-    {
-        LCD.WriteAt(r.cds.Value(), 100, 200);
-        LCD.WriteAt("Blue", 100, 150);
-        Sleep(0.5);
-        r.moveAtAngle(PI, 40);
-        r.waitFor(0.6);
-        r.stopAll();
-        Sleep(0.5);
-        r.moveAtAngle(PI/2, 40);
-        r.waitFor(0.3);
-        r.stopAll();
-        Sleep(0.5);
-        r.moveAtAngle(3*PI/2, 40);
-        r.waitFor(0.45);
-        r.stopAll();
-        Sleep(0.5);
-        r.moveAtAngle(0, 50);
-        r.waitFor(0.6);
-    }
+    /*LCD.WriteAt("Motor power: ", 50, 50);
+    LCD.WriteAt(motor_power, 218, 50);
 
-    r.moveAtAngle(0, 50);
-    r.waitFor(3);
-    r.stopAll();
-    Sleep(0.5);
+    LCD.WriteAt("Heading: ", 50, 200);
+    LCD.WriteAt(RPS.Heading(), 218, 200);*/
 
-    r.moveAtAngle(PI, 50);
-    r.waitFor(2);
-    r.stopAll();
-    Sleep(0.5);
+    Wrench.SetMin(MIN);
+    Wrench.SetMax(MAX);
+    Wrench.SetDegree(0);
+    Sleep(2.0);
+    Wrench.SetDegree(95);
+    //r.waitForPin(r.cds, 1.2, true);
 
-    r.moveAtAngle(3*PI/2, 50);
-    r.waitFor(1);
+    xy_pos.x = 0;
+    xy_pos.y = 0;
+    r.waitMoveToLocation(xy_pos, motor_power);
+    LCD.WriteAt("X-Value: ", 50, 100);
+    LCD.WriteAt(RPS.X(), 218, 100);
+    LCD.WriteAt("Y-Value: ", 50, 150);
+    LCD.WriteAt(RPS.Y(), 218, 150);
+
+    //xy_pos.x = 8.3;
+    //xy_pos.y = 16.3;
+    //r.waitMoveToLocation(xy_pos, motor_power);
+
+    //r.waitMoveToAngle(3.075252689);
+
+
+    /*xy_pos.x =
+    xy_pos.y =
+    r.waitMoveToLocation(xy_pos, motor_power);
+
+    xy_pos.x =
+    xy_pos.y =
+    r.waitMoveToLocation(xy_pos, motor_power);
+
+    xy_pos.x =
+    xy_pos.y =
+    r.waitMoveToLocation(xy_pos, motor_power);
+
+    xy_pos.x =
+    xy_pos.y =
+    r.waitMoveToLocation(xy_pos, motor_power);
+
+    xy_pos.x =
+    xy_pos.y =
+    r.waitMoveToLocation(xy_pos, motor_power);
+
+    xy_pos.x =
+    xy_pos.y =
+    r.waitMoveToLocation(xy_pos, motor_power);
+
+    r.moveAtAngle();
+    r.waitFor();
     r.stopAll();
 
-    //red range ~ 0.3 - 0.53
-    //blue range ~ 0.53 - 0.95
+    r.moveAtAngle();
+    r.waitFor();
+    r.stopAll();
+
+    r.moveAtAngle();
+    r.waitFor();
+    r.stopAll();*/
+
 }

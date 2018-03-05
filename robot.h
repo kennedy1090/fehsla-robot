@@ -21,7 +21,7 @@
 #define POSITION_TOLERANCE 1
 
 #define KILLSWITCH_PIN FEHIO::P1_0
-#define CDS_PIN FEHIO::P0_0
+#define CDS_PIN FEHIO::P3_7
 
 #define SERVO_MIN 50
 #define SERVO_MAX 2000
