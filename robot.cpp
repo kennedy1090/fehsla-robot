@@ -117,13 +117,27 @@ void Robot::waitMoveToLocation(Point location, float percent) {
     while(!kill
             && abs(estX - location.x) > POSITION_TOLERANCE
             && abs(estY - location.y) > POSITION_TOLERANCE) {
-        if(!killswitch.Value())kill = true;
 
+        waitFor(0.1);
+
+        if(!killswitch.Value())kill = true;
         updateLocation();
         estX = currentLocation.x + velocity.x * OFFSET_TIME;
         estY = currentLocation.y + velocity.y * OFFSET_TIME;
+        if(DEBUG) {
+            LCD.WriteRC("Location: ", 0, 0);
+            LCD.WriteRC(currentLocation.x, 0, 10);
+            LCD.WriteRC(currentLocation.y, 0, 20);
+            LCD.WriteRC("Angle: ", 1, 0);
+            LCD.WriteRC(currentAngle, 1, 10);
+            LCD.WriteRC("Velocity:", 2, 0);
+            LCD.WriteRC(velocity.x, 2, 10);
+            LCD.WriteRC(velocity.y, 2, 20);
+            LCD.WriteRC("Est loc:", 3, 0);
+            LCD.WriteRC(estX, 3, 10);
+            LCD.WriteRC(estY, 3, 20);
+        }
         moveToPosition(location, percent);
-        waitFor(0.1);
     }
     stopAll();
 }
