@@ -14,6 +14,7 @@
 #define PI 3.14159265
 
 #define OFFSET_TIME 0.3
+#define OFFSET_ANGLE -3.14159265/2
 
 //within 0.2 radians
 #define ANGLE_TOLERANCE 0.2
@@ -23,10 +24,10 @@
 #define KILLSWITCH_PIN FEHIO::P1_0
 #define CDS_PIN FEHIO::P3_7
 
-#define SERVO_MIN 50
-#define SERVO_MAX 2000
+#define SERVO_MIN 500
+#define SERVO_MAX 2377
 
-#define DEBUG false
+#define DEBUG true
 
 enum Motors {RIGHT = 0, TOP = 1, LEFT = 2, BOTTOM = 3};
 
@@ -55,7 +56,7 @@ public:
 
     DigitalInputPin killswitch;
     AnalogInputPin cds;
-    FEHServo servo;
+    FEHServo wrench;
 private:
 
 

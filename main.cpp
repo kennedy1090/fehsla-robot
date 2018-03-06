@@ -4,13 +4,10 @@
 
 #include "tests.h"
 
-#define MAX 2377
-#define MIN 500
-
 int main(void)
 {
+    SD.OpenLog();
     Robot r;
-    FEHServo Wrench(FEHServo::Servo0);
 
     struct Point xy_pos;
 
@@ -22,15 +19,13 @@ int main(void)
     LCD.WriteAt("Heading: ", 50, 200);
     LCD.WriteAt(RPS.Heading(), 218, 200);*/
 
-    Wrench.SetMin(MIN);
-    Wrench.SetMax(MAX);
-    Wrench.SetDegree(0);
+    r.wrench.SetDegree(0);
     Sleep(2.0);
-    Wrench.SetDegree(95);
+    r.wrench.SetDegree(95);
     //r.waitForPin(r.cds, 1.2, true);
 
-    xy_pos.x = 0;
-    xy_pos.y = 0;
+    xy_pos.x = 25.8;
+    xy_pos.y = 21.5;
     r.waitMoveToLocation(xy_pos, motor_power);
     LCD.WriteAt("X-Value: ", 50, 100);
     LCD.WriteAt(RPS.X(), 218, 100);

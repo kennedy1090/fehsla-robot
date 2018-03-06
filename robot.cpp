@@ -10,13 +10,13 @@ Robot::Robot() :
     right(FEHMotor::Motor0, 7.2), top(FEHMotor::Motor1, 7.2),
     left(FEHMotor::Motor2, 7.2), bottom(FEHMotor::Motor3, 7.2),
     killswitch(KILLSWITCH_PIN), cds(CDS_PIN), kill(false),
-    servo(FEHServo::Servo0)
+    wrench(FEHServo::Servo0)
 {
     RPS.InitializeTouchMenu();
     currentLocation = {RPS.X(),RPS.Y()};
     currentAngle = RPS.Heading() * PI / 180;
-    servo.SetMin(SERVO_MIN);
-    servo.SetMax(SERVO_MAX);
+    wrench.SetMin(SERVO_MIN);
+    wrench.SetMax(SERVO_MAX);
     if(DEBUG) {
         SD.OpenLog();
     }
@@ -27,6 +27,9 @@ void Robot::moveToPosition(Point pos, float percent) {
     float angle = atan2(pos.y - currentLocation.y, pos.x - currentLocation.x);
     angle -= currentAngle;
     angle = wrapAngle(angle);
+    if(DEBUG){
+        SD.Printf("Theory angle: %.2f\n", angle);
+    }
     moveAtAngle(angle, percent);
 }
 
@@ -66,13 +69,15 @@ void Robot::updateLocation() {
     velocity.x /= dt;
     velocity.y = currentLocation.y - locationPrev.y;
     velocity.y /= dt;
-    currentAngle = RPS.Heading() * PI / 180;
+    currentAngle = RPS.Heading() * PI / 180 + OFFSET_ANGLE;
+    currentAngle = fmod(currentAngle, 2*PI);
     angularV = currentAngle - anglePrev;
     angularV /= dt;
     lastTime = TimeNow();
     if(DEBUG) {
         SD.Printf("%.2f: (%.2f, %.2f), %2f\n", TimeNow(),
                   currentLocation.x, currentLocation.y, currentAngle);
+        SD.Printf("Angle actual: %.2f\n", atan2(velocity.y, velocity.x));
     }
 }
 void Robot::setMotor(Motors m, float percent) {
@@ -113,6 +118,8 @@ void Robot::stop(Motors m) {
  * Waits until the robot is within POSITION_TOLERANCE inches of location.
  */
 void Robot::waitMoveToLocation(Point location, float percent) {
+    LCD.Clear();
+    SD.Printf("Going to: %f, %f", location.x, location.y);
     float estX = currentLocation.x, estY = currentLocation.y;
     while(!kill
             && abs(estX - location.x) > POSITION_TOLERANCE
@@ -139,6 +146,9 @@ void Robot::waitMoveToLocation(Point location, float percent) {
         }
         moveToPosition(location, percent);
     }
+    LCD.WriteRC("At ", 4, 0);
+    LCD.WriteRC(location.x, 4, 10);
+    LCD.WriteRC(location.y, 4, 20);
     stopAll();
 }
 
