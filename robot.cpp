@@ -19,6 +19,7 @@ Robot::Robot() :
     wrench.SetMax(SERVO_MAX);
     if(DEBUG) {
         SD.OpenLog();
+        SD.Printf("Time, X, Y, Angle, Vx, Vy, estX, estY, travel angle\n");
     }
 }
 
@@ -28,7 +29,7 @@ void Robot::moveToPosition(Point pos, float percent) {
     angle -= currentAngle;
     angle = wrapAngle(angle);
     if(DEBUG){
-        SD.Printf("Theory angle: %.2f\n", angle);
+        SD.Printf("%f\n", percent, angle);
     }
     moveAtAngle(angle, percent);
 }
@@ -75,9 +76,8 @@ void Robot::updateLocation() {
     angularV /= dt;
     lastTime = TimeNow();
     if(DEBUG) {
-        SD.Printf("%.2f: (%.2f, %.2f), %2f\n", TimeNow(),
-                  currentLocation.x, currentLocation.y, currentAngle);
-        SD.Printf("Angle actual: %.2f\n", atan2(velocity.y, velocity.x));
+        SD.Printf("%f, %f, %f, %f, %f, %f, ", TimeNow(),
+                  currentLocation.x, currentLocation.y, currentAngle, velocity.x, velocity.y);
     }
 }
 void Robot::setMotor(Motors m, float percent) {
@@ -119,11 +119,10 @@ void Robot::stop(Motors m) {
  */
 void Robot::waitMoveToLocation(Point location, float percent) {
     LCD.Clear();
-    SD.Printf("Going to: %f, %f", location.x, location.y);
     float estX = currentLocation.x, estY = currentLocation.y;
     while(!kill
-            && abs(estX - location.x) > POSITION_TOLERANCE
-            && abs(estY - location.y) > POSITION_TOLERANCE) {
+            && (abs(estX - location.x) > POSITION_TOLERANCE
+            || abs(estY - location.y) > POSITION_TOLERANCE)) {
 
         waitFor(0.1);
 
@@ -132,6 +131,7 @@ void Robot::waitMoveToLocation(Point location, float percent) {
         estX = currentLocation.x + velocity.x * OFFSET_TIME;
         estY = currentLocation.y + velocity.y * OFFSET_TIME;
         if(DEBUG) {
+            SD.Printf("%f, %f, ", estX, estY);
             LCD.WriteRC("Location: ", 0, 0);
             LCD.WriteRC(currentLocation.x, 0, 10);
             LCD.WriteRC(currentLocation.y, 0, 20);
@@ -155,14 +155,16 @@ void Robot::waitMoveToLocation(Point location, float percent) {
 /*
  * Waits until the robot is within ANGLE_TOLERANCE of angle.
  */
-void Robot::waitMoveToAngle(float angle) {
+void Robot::waitMoveToAngle(float angle, float power) {
     float estAngle = currentAngle;
+    turn(angle, power);
     while(!kill && abs(estAngle - angle) > ANGLE_TOLERANCE) {
         if(!killswitch.Value())kill = true;
 
         updateLocation();
         estAngle = currentAngle + angularV * OFFSET_TIME;
     }
+    stopAll();
 }
 /*
  * Waits for the analog input pin to be less than or greater than the given threshold.
