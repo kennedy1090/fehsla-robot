@@ -6,7 +6,6 @@
 
 int main(void)
 {
-    SD.OpenLog();
     Robot r;
 
     struct Point xy_pos;
