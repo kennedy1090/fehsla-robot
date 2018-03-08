@@ -19,7 +19,7 @@ Robot::Robot() :
     wrench.SetMax(SERVO_MAX);
     if(DEBUG) {
         SD.OpenLog();
-        SD.Printf("Time, X, Y, Angle, Vx, Vy, estX, estY, travel angle\n");
+        //SD.Printf("Time, X, Y, Angle, Vx, Vy, estX, estY, travel angle\n");
     }
 }
 
@@ -61,11 +61,16 @@ void Robot::turn(float angle, float percent) {
 
 void Robot::updateLocation() {
     if(kill)return;
+    currentLocation.x = RPS.X();
+    currentLocation.y = RPS.Y();
+    if(currentLocation.x == -1 || currentLocation.y == -1) {
+        waitFor(0.1);
+        updateLocation();
+        return;
+    }
     float dt = TimeNow() - lastTime;
     Point locationPrev = currentLocation;
     float anglePrev = currentAngle;
-    currentLocation.x = RPS.X();
-    currentLocation.y = RPS.Y();
     velocity.x = currentLocation.x - locationPrev.x;
     velocity.x /= dt;
     velocity.y = currentLocation.y - locationPrev.y;
