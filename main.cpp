@@ -26,10 +26,6 @@ int main(void)
     xy_pos.x = 25.8;
     xy_pos.y = 21.5;
     r.waitMoveToLocation(xy_pos, motor_power);
-    LCD.WriteAt("X-Value: ", 50, 100);
-    LCD.WriteAt(RPS.X(), 218, 100);
-    LCD.WriteAt("Y-Value: ", 50, 150);
-    LCD.WriteAt(RPS.Y(), 218, 150);
 
     //xy_pos.x = 8.3;
     //xy_pos.y = 16.3;

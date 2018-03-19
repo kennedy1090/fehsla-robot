@@ -50,7 +50,7 @@ public:
 
     void waitForPin(AnalogInputPin pin, float threshold, bool lessThan);
     void waitForPin(DigitalInputPin pin, bool value);
-    void waitMoveToAngle(float angle);
+    void waitMoveToAngle(float angle, float power);
     void waitMoveToLocation(Point pos, float percent);
     void waitFor(float time);
 
