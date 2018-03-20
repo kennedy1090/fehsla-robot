@@ -5,6 +5,10 @@ inline float wrapAngle( float angle )
     double twoPi = 2.0 * PI;
     return angle - twoPi * floor( angle / twoPi );
 }
+inline float max(float x, float y){
+    if(x>y)return x;
+    return y;
+}
 
 Robot::Robot() :
     right(FEHMotor::Motor0, 7.2), top(FEHMotor::Motor1, 7.2),
@@ -23,21 +27,30 @@ Robot::Robot() :
     }
 }
 
-void Robot::moveToPosition(Point pos, float percent) {
+void Robot::moveToPosition(Point pos, float percent, bool slowDown) {
     if(kill)return;
-    float angle = atan2(pos.y - currentLocation.y, pos.x - currentLocation.x);
+    float distY = pos.y - currentLocation.y, distX = pos.x - currentLocation.x;
+    float angle = atan2(distY, distX);
+    float distSq = (distY*distY+distX*distX);
     angle -= currentAngle;
     angle = wrapAngle(angle);
     if(DEBUG){
-        SD.Printf("%f\n", percent, angle);
+        SD.Printf("%f\n", angle+currentAngle);
     }
-    moveAtAngle(angle, percent);
+    float percentNew = percent;
+    if(distSq < POS2*POS2 && slowDown){
+        percentNew = distSq/(POS2*POS2);
+        percentNew = max(LOWEST, percentNew);
+        percentNew *= percent;
+    }
+    //moves at percent if distance is greater than POS2, else moves at slower speed as it gets closer
+    moveAtAngle(angle, percentNew);
 }
 
 void Robot::moveAtAngle(float angle, float percent) {
     if(kill)return;
-    float vRight = percent * cos(angle);
-    float vUp = percent * sin(angle);
+    float vRight = percent* cos(angle);
+    float vUp = percent* sin(angle);
     setMotor(TOP, vRight);
     setMotor(BOTTOM, vRight);
     setMotor(RIGHT, vUp);
@@ -49,18 +62,28 @@ void Robot::stopAll() {
     stop(RIGHT);
     stop(LEFT);
 }
-void Robot::turn(float angle, float percent) {
+void Robot::turn(float angle, float percent, bool slowDown) {
     if(kill)return;
-    bool pos = (angle > currentAngle && angle - currentAngle < 3.1415) || (currentAngle > angle && currentAngle - angle  > 3.1415);
+    float angleDiff = currentAngle-angle;
+    bool pos = (angleDiff < 0 && -angleDiff < 3.1415) ||
+            (angleDiff > 0 && angleDiff > 3.1415);
     int sign = pos * 2 - 1;
-    setMotor(RIGHT, sign * percent);
-    setMotor(LEFT, -sign * percent);
-    setMotor(TOP, -sign * percent);
-    setMotor(BOTTOM, sign * percent);
+    //slows down if within ANGLE2 radians of desired angle
+    float percentNew = percent;
+    if(abs(angleDiff) < ANGLE2 && slowDown){
+        percentNew = abs(angleDiff)/ANGLE2;
+        percentNew = max(LOWEST, percentNew);
+        percentNew *= percent;
+    }
+    setMotor(RIGHT, sign * percentNew);
+    setMotor(LEFT, -sign * percentNew);
+    setMotor(TOP, -sign * percentNew);
+    setMotor(BOTTOM, sign * percentNew);
 }
 
 void Robot::updateLocation() {
     if(kill)return;
+    Point locationPrev = currentLocation;
     currentLocation.x = RPS.X();
     currentLocation.y = RPS.Y();
     if(currentLocation.x == -1 || currentLocation.y == -1) {
@@ -69,7 +92,6 @@ void Robot::updateLocation() {
         return;
     }
     float dt = TimeNow() - lastTime;
-    Point locationPrev = currentLocation;
     float anglePrev = currentAngle;
     velocity.x = currentLocation.x - locationPrev.x;
     velocity.x /= dt;
@@ -98,7 +120,7 @@ void Robot::setMotor(Motors m, float percent) {
         bottom.SetPercent(percent);
         break;
     case LEFT:
-        left.SetPercent(1.4*percent);
+        left.SetPercent(1.35*percent);
         break;
     }
 }
@@ -122,7 +144,7 @@ void Robot::stop(Motors m) {
 /*
  * Waits until the robot is within POSITION_TOLERANCE inches of location.
  */
-void Robot::waitMoveToLocation(Point location, float percent) {
+void Robot::waitMoveToLocation(Point location, float percent, bool slowDown) {
     LCD.Clear();
     float estX = currentLocation.x, estY = currentLocation.y;
     while(!kill
@@ -149,7 +171,7 @@ void Robot::waitMoveToLocation(Point location, float percent) {
             LCD.WriteRC(estX, 3, 10);
             LCD.WriteRC(estY, 3, 20);
         }
-        moveToPosition(location, percent);
+        moveToPosition(location, percent, slowDown);
     }
     LCD.WriteRC("At ", 4, 0);
     LCD.WriteRC(location.x, 4, 10);
@@ -160,13 +182,14 @@ void Robot::waitMoveToLocation(Point location, float percent) {
 /*
  * Waits until the robot is within ANGLE_TOLERANCE of angle.
  */
-void Robot::waitMoveToAngle(float angle, float power) {
+void Robot::waitMoveToAngle(float angle, float power, bool slowDown) {
     float estAngle = currentAngle;
-    turn(angle, power);
+    turn(angle, power, slowDown);
     while(!kill && abs(estAngle - angle) > ANGLE_TOLERANCE) {
         if(!killswitch.Value())kill = true;
-
+        waitFor(0.1);
         updateLocation();
+        turn(angle, power, slowDown);
         estAngle = currentAngle + angularV * OFFSET_TIME;
     }
     stopAll();

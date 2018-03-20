@@ -1,5 +1,5 @@
 clc; clear; close all;
-Info = csvread('LOG00X.TXT');
+Info = csvread('LOG007.TXT');
 Time = Info(:, 1);
 X = Info(:, 2);
 Y = Info(:,3);
@@ -34,14 +34,20 @@ set(gca,'ydir','normal')
 set(gca, 'YAxisLocation','right')
 set(hFig, 'Resize','off')
 hold on
-act = quiver(X, Y, Vx, Vy);
-act2 = quiver(X, Y, TrX, TrY);
+destX = 25.8;
+destY = 21.5;
+tolerance = 1;
+r = rectangle('Position', [destY-tolerance, destX-tolerance, 2*tolerance, 2*tolerance])
+set(r, 'EdgeColor', 'green');
+
+act = quiver(Y, X, Vy, Vx);
+act2 = quiver(Y, X, TrY, TrX);
 set(act, 'Color', 'red');
 set(act2, 'Color', 'blue');
-est = quiver(Estx, Esty, Vx, Vy);
-est2 = quiver(Estx, Esty, TrX, TrY);
+est = quiver(Esty, Estx, Vy, Vx);
+est2 = quiver(Esty, Estx, TrY, TrX);
 set(est, 'Color', 'red');
 set(est2, 'Color', 'blue');
-scatter(X, Y);
-scatter(Estx, Esty, 'filled');
+scatter(Y, X);
+scatter(Esty, Estx, 'filled');
 hold off

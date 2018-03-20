@@ -17,9 +17,13 @@
 #define OFFSET_ANGLE 3*3.14159265/2
 
 //within 0.2 radians
-#define ANGLE_TOLERANCE 0.2
+#define ANGLE_TOLERANCE 0.1
+#define ANGLE2 1
 //within 1 inch
-#define POSITION_TOLERANCE 1
+#define POSITION_TOLERANCE 0.5
+#define POS2 5
+
+#define LOWEST 0.2
 
 #define KILLSWITCH_PIN FEHIO::P1_0
 #define CDS_PIN FEHIO::P3_7
@@ -40,8 +44,8 @@ public:
     Robot();
     //Angles are in radians
     void moveAtAngle(float angle, float percent);
-    void turn(float angle, float percent);
-    void moveToPosition(Point pos, float percent);
+    void turn(float angle, float percent, bool slow);
+    void moveToPosition(Point pos, float percent, bool slow);
     void updateLocation();
     void setMotor(Motors m, float percent);
 
@@ -50,8 +54,8 @@ public:
 
     void waitForPin(AnalogInputPin pin, float threshold, bool lessThan);
     void waitForPin(DigitalInputPin pin, bool value);
-    void waitMoveToAngle(float angle, float power);
-    void waitMoveToLocation(Point pos, float percent);
+    void waitMoveToAngle(float angle, float power, bool slow);
+    void waitMoveToLocation(Point pos, float percent, bool slow);
     void waitFor(float time);
 
     DigitalInputPin killswitch;
