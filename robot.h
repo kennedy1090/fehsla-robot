@@ -23,7 +23,7 @@
 #define POSITION_TOLERANCE 0.5
 #define POS2 5
 
-#define LOWEST 0.2
+#define LOWEST 0.3
 
 #define KILLSWITCH_PIN FEHIO::P1_0
 #define CDS_PIN FEHIO::P3_7
