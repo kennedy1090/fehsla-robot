@@ -39,3 +39,5 @@ fehsla-robot.*
 # QtCtreator CMake
 CMakeLists.txt.user*
 
+#FEH proteus
+fehproteusfirmware/
