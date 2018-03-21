@@ -29,6 +29,7 @@ Makefile*
 
 # QtCreator
 
+fehsla-robot.*
 *.autosave
 
 # QtCtreator Qml
