@@ -23,13 +23,18 @@
 #define POSITION_TOLERANCE 0.5
 #define POS2 5
 
+#define PULSE_TIME 0.1
+
 #define LOWEST 0.3
 
 #define KILLSWITCH_PIN FEHIO::P1_0
 #define CDS_PIN FEHIO::P3_7
 
-#define SERVO_MIN 500
-#define SERVO_MAX 2377
+#define WRENCH_MIN 500
+#define WRENCH_MAX 2377
+
+#define WHEEL_MIN 512
+#define WHEEL_MAX 2500
 
 #define DEBUG true
 
@@ -41,7 +46,7 @@ struct Point {
 class Robot
 {
 public:
-    Robot();
+    Robot(bool rps);
     //Angles are in radians
     void moveAtAngle(float angle, float percent);
     void turn(float angle, float percent, bool slow);
@@ -56,11 +61,15 @@ public:
     void waitForPin(DigitalInputPin pin, bool value);
     void waitMoveToAngle(float angle, float power, bool slow);
     void waitMoveToLocation(Point pos, float percent, bool slow);
+    void waitMoveToAngle(float angle, float power, bool slow, float tolerance);
+    void waitMoveToLocation(Point pos, float percent, bool slow, float tolerance);
     void waitFor(float time);
 
     DigitalInputPin killswitch;
     AnalogInputPin cds;
+
     FEHServo wrench;
+    FEHServo wheel;
 private:
 
 
