@@ -16,14 +16,14 @@
 #define OFFSET_TIME 0.3
 #define OFFSET_ANGLE 3*3.14159265/2
 
-//within 0.2 radians
+//within 0.4 radians
 #define ANGLE_TOLERANCE 0.1
 #define ANGLE2 1
 //within 1 inch
 #define POSITION_TOLERANCE 0.5
 #define POS2 5
 
-#define PULSE_TIME 0.1
+#define PULSE_TIME 0.2
 
 #define LOWEST 0.3
 
@@ -59,11 +59,13 @@ public:
 
     void waitForPin(AnalogInputPin pin, float threshold, bool lessThan);
     void waitForPin(DigitalInputPin pin, bool value);
-    void waitMoveToAngle(float angle, float power, bool slow);
-    void waitMoveToLocation(Point pos, float percent, bool slow);
-    void waitMoveToAngle(float angle, float power, bool slow, float tolerance);
-    void waitMoveToLocation(Point pos, float percent, bool slow, float tolerance);
+    //Both of these slow down by default
+    void waitMoveToAngle(float angle, float power, bool slow = true, float tolerance = ANGLE_TOLERANCE);
+    void waitMoveToLocation(Point pos, float percent, bool slow = true, float tolerance = POSITION_TOLERANCE);
     void waitFor(float time);
+
+    void pulse(Point location, float percent, float tolerance);
+    void pulseAngle(float angle, float percent, float tolerance);
 
     DigitalInputPin killswitch;
     AnalogInputPin cds;
