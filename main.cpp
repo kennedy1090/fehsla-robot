@@ -1,6 +1,7 @@
 #include <FEHLCD.h>
 #include <FEHIO.h>
 #include <FEHUtility.h>
+#include <FEHBattery.h>
 
 #include "tests.h"
 
@@ -9,6 +10,7 @@ int main(void){
     Point wrench = {9.5, 16.8};
 
     Point by_start = {15, 19};
+    Point by_start_end = {17, 19};
 
     Point white_button = {25.8, 21};
     Point red_button = {white_button.x - 3.5, white_button.y};
@@ -19,7 +21,7 @@ int main(void){
     Point by_garage = {16.5, 55.5};
     Point above_wheel = {22, 65};
     Point below_wheel = {24, 63};
-    Point by_wheel = {23, 63.2};
+    Point by_wheel = {22.8, 63.2};
     Point at_wheel = {24, 64.4};
 
     float colorBoundary = 0.55;
@@ -28,6 +30,7 @@ int main(void){
 
     int move_power = 50;
     int turn_power = 40;
+    int wrench_power = 25;
 
     r.wrench.SetDegree(0);
     if(RPS.FuelType() == 1){
@@ -37,6 +40,8 @@ int main(void){
     }
 
     r.waitForPin(r.cds, 1.2, true);
+
+    LCD.WriteAt(Battery.Voltage(), 200, 200);
 
     //Jack
     r.waitMoveToLocation(jack, move_power, false, 1);
@@ -54,20 +59,21 @@ int main(void){
 
     //Wrench
     r.waitMoveToLocation(wrench,  move_power);
-    r.waitMoveToAngle(PI/2, turn_power, true, 0.08);
-    r.wrench.SetDegree(102);
-    r.waitFor(1);
-    r.moveAtAngle(PI/2, move_power);
+    r.waitMoveToAngle((PI/2), turn_power, true, 0.08);
+    r.wrench.SetDegree(95);
     r.waitFor(0.5);
+    r.moveAtAngle(PI/2, wrench_power);
+    r.waitFor(0.74);
     r.stopAll();
     r.wrench.SetDegree(0);
+    r.waitFor(0.3);
     r.waitMoveToLocation(by_start, move_power);
 
     //Button panel
     r.waitMoveToLocation(white_button, move_power);
     float color = r.cds.Value();
     LCD.WriteAt(color, 0, 0);
-    r.waitFor(5);
+    r.waitFor(1);
     r.waitMoveToAngle(PI/2, turn_power);
     //drive into RPS button
     r.moveAtAngle(PI, 30);
@@ -85,7 +91,7 @@ int main(void){
     } else {
         button = blue_button;
     }
-    r.waitMoveToLocation(button, move_power);
+    r.waitMoveToLocation(button, move_power + 10);
     r.moveAtAngle(PI, 30);
     r.waitFor(1);
     r.stopAll();
@@ -95,7 +101,7 @@ int main(void){
     r.waitMoveToLocation(bottom_ramp, move_power);
     r.waitMoveToAngle(PI/4, 35);
 
-    r.moveAtAngle(PI/4, 70);
+    r.moveAtAngle(PI/4 - 0.2, 70);
     r.waitFor(3);
 
     r.waitMoveToLocation(top_ramp, move_power);
@@ -105,17 +111,17 @@ int main(void){
     r.waitFor(0.5);
 
     //Garage
-    r.waitMoveToLocation(by_garage, move_power, true, 1);
+    r.waitMoveToLocation(by_garage, move_power);
     r.waitMoveToAngle(PI/4, move_power);
     r.moveAtAngle(PI/2, move_power);
     r.waitFor(2);
     r.stopAll();
     r.wrench.SetDegree(102);
     r.waitFor(2);
-    r.moveAtAngle(3*PI/2, move_power);
+    r.moveAtAngle(3*PI/2, move_power - 15);
     r.waitFor(2);
     r.wrench.SetDegree(0);
-    r.waitMoveToLocation(by_garage, move_power, true, 1);
+    r.waitMoveToLocation(by_garage, move_power);
 
     //Wheel
     r.waitMoveToAngle(3*PI/4, 40);
@@ -147,7 +153,7 @@ int main(void){
     r.waitMoveToLocation(top_ramp, move_power);
     r.waitMoveToAngle(PI/4, 40, false);
     r.waitMoveToLocation(bottom_ramp, move_power);
-    r.waitMoveToLocation(by_start, move_power);
+    r.waitMoveToLocation(by_start_end, move_power);
     r.waitMoveToAngle(0, move_power);
     r.moveAtAngle(PI/2, move_power);
 
