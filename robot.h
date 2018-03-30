@@ -14,7 +14,7 @@
 #define PI 3.14159265
 
 #define OFFSET_TIME 0.3
-#define OFFSET_ANGLE 3*3.14159265/2
+#define OFFSET_ANGLE 3.14159265/2
 
 //within 0.4 radians
 #define ANGLE_TOLERANCE 0.1
@@ -28,7 +28,7 @@
 #define LOWEST 0.3
 
 #define KILLSWITCH_PIN FEHIO::P1_0
-#define CDS_PIN FEHIO::P3_7
+#define CDS_PIN FEHIO::P0_0
 
 #define WRENCH_MIN 500
 #define WRENCH_MAX 2377
@@ -60,8 +60,8 @@ public:
     void waitForPin(AnalogInputPin pin, float threshold, bool lessThan);
     void waitForPin(DigitalInputPin pin, bool value);
     //Both of these slow down by default
-    void waitMoveToAngle(float angle, float power, bool slow = true, float tolerance = ANGLE_TOLERANCE);
-    void waitMoveToLocation(Point pos, float percent, bool slow = true, float tolerance = POSITION_TOLERANCE);
+    void waitMoveToAngle(float angle, float power, float tolerance = ANGLE_TOLERANCE);
+    void waitMoveToLocation(Point pos, float percent, float tolerance = POSITION_TOLERANCE);
     void waitFor(float time);
 
     void pulse(Point location, float percent, float tolerance);
