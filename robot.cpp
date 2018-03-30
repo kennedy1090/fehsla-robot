@@ -31,7 +31,7 @@ Robot::Robot(bool rps) :
     }
 }
 
-void Robot::moveToPosition(Point pos, float percent, bool slow) {
+void Robot::moveToLocation(Point pos, float percent, bool slow) {
     if(kill)return;
     float distY = pos.y - currentLocation.y, distX = pos.x - currentLocation.x;
     float angle = atan2(distY, distX);
@@ -161,7 +161,7 @@ void Robot::waitMoveToLocation(Point location, float percent, float tolerance) {
     LCD.Clear();
     updateLocation();
     float estX = currentLocation.x, estY = currentLocation.y;
-    moveToPosition(location, percent, true);
+    moveToLocation(location, percent, true);
     while(abs(estX - location.x) > tolerance
           || abs(estY - location.y) > tolerance) {
 
@@ -178,7 +178,7 @@ void Robot::waitMoveToLocation(Point location, float percent, float tolerance) {
         if(DEBUG) {
             SD.Printf("%f, %f, ", estX, estY);
         }
-        moveToPosition(location, percent, true);
+        moveToLocation(location, percent, true);
     }
     stopAll();
     waitFor(OFFSET_TIME);
@@ -192,7 +192,7 @@ void Robot::pulse(Point location, float percent, float tolerance) {
     updateLocation();
     while(abs(currentLocation.x - location.x) > tolerance
           || abs(currentLocation.y - location.y) > tolerance) {
-        moveToPosition(location, percent, false);
+        moveToLocation(location, percent, false);
         waitFor(PULSE_TIME);
         stopAll();
         waitFor(OFFSET_TIME);
@@ -204,10 +204,10 @@ void Robot::pulse(Point location, float percent, float tolerance) {
 /*
  * Waits until the robot is within ANGLE_TOLERANCE of angle.
  */
-void Robot::waitMoveToAngle(float angle, float power, float tolerance) {
+void Robot::waitTurnToAngle(float angle, float percent, float tolerance) {
     if(kill)return;
     float estAngle = currentAngle;
-    turn(angle, power, true);
+    turn(angle, percent, true);
     while(abs(estAngle - angle) > tolerance) {
         if(!killswitch.Value()){
             kill = true;
@@ -216,12 +216,12 @@ void Robot::waitMoveToAngle(float angle, float power, float tolerance) {
         }
         waitFor(0.1);
         updateLocation();
-        turn(angle, power, true);
+        turn(angle, percent, true);
         estAngle = currentAngle + angularV * OFFSET_TIME;
     }
     stopAll();
     waitFor(OFFSET_TIME);
-    pulseAngle(angle, LOWEST*power, tolerance);
+    pulseAngle(angle, LOWEST*percent, tolerance);
 }
 
 void Robot::pulseAngle(float angle, float percent, float tolerance) {

@@ -50,7 +50,7 @@ public:
     //Angles are in radians
     void moveAtAngle(float angle, float percent);
     void turn(float angle, float percent, bool slow);
-    void moveToPosition(Point pos, float percent, bool slow);
+    void moveToLocation(Point pos, float percent, bool slow);
     void updateLocation();
     void setMotor(Motors m, float percent);
 
@@ -60,7 +60,7 @@ public:
     void waitForPin(AnalogInputPin pin, float threshold, bool lessThan);
     void waitForPin(DigitalInputPin pin, bool value);
     //Both of these slow down by default
-    void waitMoveToAngle(float angle, float power, float tolerance = ANGLE_TOLERANCE);
+    void waitTurnToAngle(float angle, float percent, float tolerance = ANGLE_TOLERANCE);
     void waitMoveToLocation(Point pos, float percent, float tolerance = POSITION_TOLERANCE);
     void waitFor(float time);
 

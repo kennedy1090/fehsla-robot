@@ -18,7 +18,7 @@ int main(void){
     Point wrench = {9.1, 16.2};
 
     Point by_start = {17.5, 19};
-    Point end = {25, 19};
+    Point end = {17.5, 40};
 
     Point white_button = {25.8, 20};
     Point red_button = {white_button.x - 3.5, white_button.y};
@@ -26,13 +26,13 @@ int main(void){
 
     Point bottom_ramp = {29.5, 22.5};
     Point top_ramp = {28.8, 42.1};
-    Point by_garage = {16.5, 54.5};
+    Point by_garage = {16.5, 55};
     Point above_wheel = {20, 62};
     Point below_wheel = {22, 58};
     Point by_wheel = {25.7, 60.7};
     Point at_wheel = {26.6, 61.5};
 
-    float colorBoundary = 1;
+    float colorBoundary = 1.5;
 
     Robot r(true);
 
@@ -51,7 +51,7 @@ int main(void){
     r.waitMoveToLocation(jack, move_power, 1);
     r.stopAll();
     r.waitFor(0.3);
-    r.waitMoveToAngle(PI, turn_power);
+    r.waitTurnToAngle(PI, turn_power);
     r.moveAtAngle(PI, move_power);
     r.waitFor(1);
     r.stopAll();
@@ -63,7 +63,7 @@ int main(void){
 
     //Wrench
     r.waitMoveToLocation(wrench,  move_power, 0.2);
-    r.waitMoveToAngle(PI/2, turn_power, 0.08);
+    r.waitTurnToAngle(PI/2, turn_power, 0.08);
     r.pulseAngle(PI/2, turn_power*LOWEST, 0.05);
     r.wrench.SetDegree(104);
     r.waitFor(0.5);
@@ -76,10 +76,10 @@ int main(void){
 
     //Button panel
     r.waitMoveToLocation(white_button, move_power);
-    float color = r.cds.Value();
+    float color = 0;
     LCD.WriteAt(color, 0, 0);
     r.waitFor(1);
-    r.waitMoveToAngle(PI/2, turn_power);
+    r.waitTurnToAngle(PI/2, turn_power);
     //drive into RPS button
     r.moveAtAngle(PI, 30);
     r.waitFor(1);
@@ -105,7 +105,7 @@ int main(void){
 
     //Ramp
     r.waitMoveToLocation(bottom_ramp, move_power);
-    r.waitMoveToAngle(PI/4, 35);
+    r.waitTurnToAngle(PI/4, 35);
 
     r.moveAtAngle(PI/4 - 0.2, 70);
     r.waitFor(3);
@@ -118,7 +118,7 @@ int main(void){
 
     //Garage
     r.waitMoveToLocation(by_garage, move_power);
-    r.waitMoveToAngle(PI/4, move_power, 0.05);
+    r.waitTurnToAngle(PI/4-0.1, move_power, 0.05);
     r.moveAtAngle(PI/2, move_power);
     r.waitFor(2);
     r.stopAll();
@@ -137,16 +137,16 @@ int main(void){
 
 
     //Wheel
-    r.waitMoveToAngle(3*PI/4, 40);
+    r.waitTurnToAngle(3*PI/4, 40);
     if(RPS.FuelType() == 1){
         r.waitMoveToLocation(above_wheel, move_power);
     } else {
         r.waitMoveToLocation(below_wheel, move_power);
     }
-    r.waitMoveToAngle(3*PI/4, 40, 0.08);
+    r.waitTurnToAngle(3*PI/4, 40, 0.08);
 
     r.waitMoveToLocation(by_wheel, move_power);
-    r.waitMoveToAngle(3*PI/4, 40, 0.08);
+    r.waitTurnToAngle(3*PI/4, 40, 0.08);
     r.pulse(by_wheel, move_power*LOWEST, 0.2);
     r.pulseAngle(3*PI/4-0.1, 20, 0.1);
     r.moveAtAngle(-PI/2, move_power);
@@ -167,7 +167,7 @@ int main(void){
     r.waitMoveToLocation(top_ramp, move_power, 2);
     r.waitMoveToLocation(bottom_ramp, move_power, 2);
     r.waitMoveToLocation(by_start, move_power);
-    r.waitMoveToAngle(0, move_power, 0.08);
+    r.waitTurnToAngle(0, move_power, 0.08);
     r.waitMoveToLocation(end, move_power);
 
     LCD.WriteAt("We did it (maybe)!", 0, 0);
