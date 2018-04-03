@@ -13,7 +13,7 @@
 
 #define PI 3.14159265
 
-#define OFFSET_TIME 0.3
+#define OFFSET_TIME 0.2
 #define OFFSET_ANGLE 3.14159265/2
 
 //within 0.4 radians
@@ -23,7 +23,7 @@
 #define POSITION_TOLERANCE 0.5
 #define POS2 5
 
-#define PULSE_TIME 0.2
+#define PULSE_TIME 0.25
 
 #define LOWEST 0.3
 
@@ -54,7 +54,7 @@ public:
     void updateLocation();
     void setMotor(Motors m, float percent);
 
-    void goAndStop(float angle, float percent, float time, bool stop);
+    void goAndStop(float angle, float percent, float time, bool stop = 0);
 
     void stop(Motors m);
     void stopAll();
