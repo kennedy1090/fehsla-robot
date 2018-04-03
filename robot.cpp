@@ -31,6 +31,15 @@ Robot::Robot(bool rps) :
     }
 }
 
+void Robot::goAndStop(float angle, float percent, float time, bool stop){
+    moveAtAngle(angle, percent);
+    waitFor(time);
+    if (stop = 1)
+    {
+        stopAll();
+    }
+}
+
 void Robot::moveToLocation(Point pos, float percent, bool slow) {
     if(kill)return;
     float distY = pos.y - currentLocation.y, distX = pos.x - currentLocation.x;

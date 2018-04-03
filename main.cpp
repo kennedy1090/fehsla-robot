@@ -14,40 +14,36 @@ Point getCoordinates() {
 }
 
 int main(void){
-    Point jack = {5, 7.2};
-    Point jack_side = {12, 12};
-    Point wrench = {9.1, 16.2};
+    Point jack_side = {11.599 + 0.4, 12.099};
+    Point wrench = {9.13, 16.4};
 
     Point by_start = {17.5, 19};
-    Point before_end = {17.5, 21};
+    Point before_end = {17.5, 21.5};
     Point end = {17.5, 40};
 
     Point white_button = {25.8, 20};
-    Point red_button = {white_button.x - 3.5, white_button.y};
-    Point blue_button = {white_button.x +  3.5, white_button.y};
 
-    Point bottom_ramp = {29.5, 22.5};
+    Point bottom_ramp = {28.5, 21.5};
     Point top_ramp = {28.8, 42.1};
-    Point by_garage = {16.5, 55};
-    Point above_wheel = {20, 62};
-    Point below_wheel = {22, 58};
-    Point by_wheel = {25.7, 60.7};
-    Point at_wheel = {26.6, 61.5};
-    Point grass_ramp = {5, 24.4};
 
-    float colorBoundary = 1.5;
+    Point by_garage = {16.5, 55};
+    Point by_wheel = {25.9 , 60.4};
+
+    Point grass_ramp = {4.5, 23};
+
+    float colorBoundary = 1;
 
     Robot r(true);
 
-    int move_power = 50;
+    int move_power = 51;
     int turn_power = 38;
     int wrench_power = 25;
     int big_speed = 70;
 
     /*while(true)
     {
-    LCD.WriteAt("Motor power: ", 50, 50);
-        LCD.WriteAt(move_power, 218, 50);
+    LCD.WriteAt("Cds Value: ", 50, 50);
+        LCD.WriteAt(r.cds.Value(), 218, 50);
         LCD.WriteAt("X-Value: ", 50, 100);
         LCD.WriteAt(RPS.X(), 218, 100);
         LCD.WriteAt("Y-Value: ", 50, 150);
@@ -56,197 +52,140 @@ int main(void){
         LCD.WriteAt(RPS.Heading(), 218, 200);
     }*/
 
+    //Initialize servos
     r.wrench.SetDegree(0);
     r.wheel.SetDegree(90);
 
+    //Start light
     r.waitForPin(r.cds, 1.2, true);
 
     //Button panel
 
     //Move to the led blind
-    r.moveAtAngle(2.29, big_speed);
-    r.waitFor(0.25);
+    r.goAndStop(2.29, big_speed + 10, 0.5, 1);
 
     //Adjust to the exact position
     r.waitMoveToLocation(white_button, move_power);
     r.waitTurnToAngle(PI - 0.05, turn_power, 0.1);
-    float color = 0;
-    LCD.WriteAt(color, 0, 0);
     r.waitFor(0.1);
 
-
-
     //drive into RPS button
-    r.moveAtAngle(PI/2, move_power);
-    r.waitFor(0.26);
-    r.stopAll();
+    r.goAndStop(PI/2, move_power, 0.24, 1);
+
+    //Makes sure RPS is on
     while(RPS.IsDeadzoneActive() != 2) {
         r.waitFor(1);
     }
 
+    //Back up
+    r.goAndStop(3*PI/2, big_speed, 0.15, 0);
+
     //Hit the correct color button
-    Point button;
-    if(color < colorBoundary) {
-        button = red_button;
+    if(r.cds.Value() < colorBoundary) {
+        r.goAndStop(PI/4 - 0.35, big_speed, 0.65, 0);
+        r.goAndStop(PI/4 - 0.35 + PI, big_speed, 0.3, 0);
 
-        /*Turn to the red button
-        r.waitTurnToAngle(1.977458+PI/2, turn_power, 0.1);
-        r.moveAtAngle(PI/2, 30);
-        r.waitFor(0.1);
-        r.stopAll();
-
-        r.moveAtAngle(PI/4, big_speed);
-        r.waitFor(0.2);
-        r.stopAll();
-        r.waitFor(0.5);*/
-
-
-    } else {
-        button = blue_button;
-
-        /*Move to the blue button
-        r.waitTurnToAngle(1.097812+PI/2, turn_power, 0.1);
-        r.moveAtAngle(PI/2, 30);
-        r.waitFor(0.1);
-        r.stopAll();
-
-        r.moveAtAngle(3*PI/4, big_speed);
-        r.waitFor(0.2);
-        r.stopAll();
-        r.waitFor(0.5);*/
+        //Move a little extra
+        r.goAndStop(0, big_speed + 10, 0.1, 0);
     }
 
+    else {
+        r.goAndStop(3*PI/4 + 0.35, big_speed, 0.65, 0);
+        r.goAndStop(3*PI/4 + 0.35 + PI, big_speed, 0.3, 0);
+    }
 
     //Jack
-
-    //Move to Jack Blind
-    r.moveAtAngle(3*PI/2, big_speed);
-    r.waitFor(0.15);
     r.waitTurnToAngle(PI, turn_power, 0.1);
-    r.moveAtAngle(0 , big_speed);
-    r.waitFor(1.4);
-    r.stopAll();
-    r.wrench.SetDegree(115);
+    r.goAndStop(0, big_speed + 10, 1.3, 1);
+    r.wrench.SetDegree(120);
 
     //Make correct adjustments
-    r.waitMoveToLocation(jack_side, move_power, 0.3);
+    r.waitMoveToLocation(jack_side, move_power, 0.5);
     r.stopAll();
 
     //Turn to correct angle for Jack
     r.waitTurnToAngle(PI, turn_power, 0.1);
-
 
     //Back up while raising the servo angle
     r.wrench.SetDegree(80);
     r.moveAtAngle(3*PI/2, big_speed);
     r.waitFor(0.1);
 
-
-    /*r.waitFor(0.3);
-    r.waitTurnToAngle(PI, turn_power);
-    r.moveAtAngle(PI, move_power);
-    r.waitFor(1);
-    r.stopAll();
-    r.waitFor(0.2);
-    r.moveAtAngle(0, move_power);
-    r.waitFor(0.3);
-    r.stopAll();
-    r.waitFor(0.3);*/
-
     //Wrench
-    r.waitMoveToLocation(wrench,  move_power, 0.2);
+    r.waitMoveToLocation(wrench,move_power, 0.23);
     r.waitTurnToAngle(PI/2, turn_power, 0.08);
     r.pulseAngle(PI/2, turn_power*LOWEST, 0.05);
     r.wrench.SetDegree(107);
     r.waitFor(0.5);
-    r.moveAtAngle(PI/2, wrench_power);
-    r.waitFor(0.74);
-    r.stopAll();
+    r.goAndStop(PI/2, wrench_power, 0.74, 1);
     r.wrench.SetDegree(0);
     r.waitFor(0.3);
 
     //Grass Ramp
-    r.waitMoveToLocation(grass_ramp, move_power);
+    r.waitMoveToLocation(grass_ramp, move_power, 0.2);
     r.waitTurnToAngle(PI/4, 35);
-    r.moveAtAngle(PI/4 - 0.12, 70);
-    r.waitFor(3);
+    r.moveAtAngle(PI/4 - 0.1, big_speed + 20);
+    r.waitFor(2.5);
 
     //Garage
-    r.waitMoveToLocation(by_garage, move_power);
-    r.waitTurnToAngle(PI/4-0.08, turn_power, 0.05);
-    r.moveAtAngle(PI/2, big_speed);
-    r.waitFor(1);
-    r.stopAll();
+    r.waitMoveToLocation(by_garage, move_power, 0.2);
+    r.waitTurnToAngle(PI/4 - 0.14, turn_power - 5, 0.05);
+    r.goAndStop(PI/2, big_speed, 1, 1);
     r.wrench.SetDegree(105);
-    r.waitFor(2);
-    r.moveAtAngle(3*PI/2, move_power);
     r.waitFor(1);
-    r.wrench.SetDegree(0);
-    r.waitMoveToLocation(by_garage, move_power);
 
+    //Back out Diagonally
+    r.goAndStop(-PI/4, big_speed + 10, 1, 1);
+    r.wrench.SetDegree(0);
+
+    //Checks the fuel type
     if(RPS.FuelType() == 1){
         r.wheel.SetDegree(0);
     } else {
         r.wheel.SetDegree(180);
     }
-
 
     //Wheel
-    r.waitTurnToAngle(3*PI/4, 40);
-    if(RPS.FuelType() == 1){
-        r.waitMoveToLocation(above_wheel, move_power);
-    } else {
-        r.waitMoveToLocation(below_wheel, move_power);
-    }
-    r.waitTurnToAngle(3*PI/4, 40, 0.08);
+    //Turns to correct angle
+    r.waitTurnToAngle(3*PI/4 - 0.035, turn_power);
 
+    //Move to the wheel
     r.waitMoveToLocation(by_wheel, move_power);
-    r.waitTurnToAngle(3*PI/4, 40, 0.08);
-    r.pulse(by_wheel, move_power*LOWEST, 0.2);
-    r.pulseAngle(3*PI/4-0.1, 20, 0.1);
-    r.moveAtAngle(-PI/2, move_power);
-    r.waitFor(0.43);
-    r.stopAll();
+    r.goAndStop(-PI/2, move_power, 0.5, 1);
 
+    //Turn the fuel pump
     r.wheel.SetDegree(90);
-    r.waitFor(1);
+    r.waitFor(0.5);
     if(RPS.FuelType() == 1){
         r.wheel.SetDegree(180);
     } else {
         r.wheel.SetDegree(0);
     }
-    r.waitFor(2);
+    r.waitFor(0.5);
 
     //End
-    //r.moveAtAngle(PI/2, big_speed);
-    //r.waitFor(0.4);
+    r.moveAtAngle(PI/2, big_speed);
+    r.waitFor(0.4);
     r.waitMoveToLocation(by_garage, move_power, 2);
 
-    r.moveAtAngle(3*PI/2, big_speed);
+    //Move to top of ramp
+    r.moveAtAngle(PI, big_speed + 10);
     r.waitFor(0.6);
     r.waitMoveToLocation(top_ramp, move_power, 2);
 
-    r.moveAtAngle(3*PI/4, big_speed);
-    r.waitFor(0.3);
+    //Move to bottom of ramp
+    r.moveAtAngle(3*PI/4, big_speed + 20);
+    r.waitFor(0.2);
     r.waitMoveToLocation(bottom_ramp, move_power, 2);
 
-
+    //Move to before the end
+    r.goAndStop(PI/4, big_speed + 10, 1, 1);
+    Sleep(0.2);
     r.waitMoveToLocation(before_end, move_power);
-    r.waitTurnToAngle(PI/2, turn_power, 0.1);
+
+    //Turn and move to end
+    r.waitTurnToAngle(PI, turn_power, 0.2);
     r.waitMoveToLocation(end, big_speed);
 
     LCD.WriteAt("We did it (maybe)!", 0, 0);
-
-
-    /*Ramp
-    r.waitMoveToLocation(bottom_ramp, move_power);
-
-
-    r.waitMoveToLocation(top_ramp, move_power);
-    r.turn(1, 30, false);
-    r.waitFor(0.5);
-    r.stopAll();
-    r.waitFor(0.5);*/
-
-
 };

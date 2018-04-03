@@ -54,6 +54,8 @@ public:
     void updateLocation();
     void setMotor(Motors m, float percent);
 
+    void goAndStop(float angle, float percent, float time, bool stop);
+
     void stop(Motors m);
     void stopAll();
 
