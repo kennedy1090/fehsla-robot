@@ -34,8 +34,7 @@ Robot::Robot(bool rps) :
 void Robot::goAndStop(float angle, float percent, float time, bool stop){
     moveAtAngle(angle, percent);
     waitFor(time);
-    if (stop = 1)
-    {
+    if (stop = 1){
         stopAll();
     }
 }

@@ -21,4 +21,17 @@ void Tests::testRPS() {
         LCD.WriteAt(RPS.Heading(), 60, 40);
         Sleep(0.1);
     }
+
+    /*while(true)
+    {
+    LCD.WriteAt("Cds Value: ", 50, 50);
+        LCD.WriteAt(r.cds.Value(), 218, 50);
+        LCD.WriteAt("X-Value: ", 50, 100);
+        LCD.WriteAt(RPS.X(), 218, 100);
+        LCD.WriteAt("Y-Value: ", 50, 150);
+        LCD.WriteAt(RPS.Y(), 218, 150);
+        LCD.WriteAt("Heading: ", 50, 200);
+        LCD.WriteAt(RPS.Heading(), 218, 200);
+        Sleep(0.1);
+    }*/
 }
