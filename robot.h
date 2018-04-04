@@ -13,7 +13,7 @@
 
 #define PI 3.14159265
 
-#define OFFSET_TIME 0.2
+#define OFFSET_TIME 0.3
 #define OFFSET_ANGLE 3.14159265/2
 
 //within 0.4 radians
@@ -23,7 +23,7 @@
 #define POSITION_TOLERANCE 0.5
 #define POS2 5
 
-#define PULSE_TIME 0.25
+#define PULSE_TIME 0.2
 
 #define LOWEST 0.3
 
@@ -42,6 +42,7 @@ enum Motors {RIGHT = 0, TOP = 1, LEFT = 2, BOTTOM = 3};
 
 struct Point {
     float x, y;
+    float heading_1, heading_2, heading_3;
 };
 class Robot
 {
