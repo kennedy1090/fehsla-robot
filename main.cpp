@@ -37,6 +37,8 @@ Point getCoordinates(char* name, Robot r, bool heading, int number) {
 }
 
 int main(void){
+
+
     //Point jack_side = {12, 12.3};
 
     //Point wrench = {9.13, 16.4};
@@ -48,10 +50,10 @@ int main(void){
     Point white_button = {25.8, 20};
 
     Point bottom_ramp = {28.5, 21.5};
-    Point top_ramp = {29.5, 41.7};
+    Point top_ramp = {30, 41.7};
 
     //Point by_garage = {16.5, 55};
-    Point by_garage_2 = {22, 47.5};
+    Point by_garage_2 = {23.5, 47.8};
 
     //Point by_wheel = {25.9 , 60.4};
 
@@ -61,6 +63,27 @@ int main(void){
     float x,y, heading_1, heading_2, heading_3;
 
     Robot r(true);
+
+    while(true)
+    {
+        r.goAndStop(PI/4, 100, 10);
+        r.goAndStop(PI, 100, 10);
+        r.goAndStop(PI/2, 100, 10);
+    }
+
+    /*while(true)
+    {
+    LCD.WriteAt("Cds Value: ", 50, 50);
+        LCD.WriteAt(r.cds.Value(), 218, 50);
+        LCD.WriteAt("X-Value: ", 50, 100);
+        LCD.WriteAt(RPS.X(), 218, 100);
+        LCD.WriteAt("Y-Value: ", 50, 150);
+        LCD.WriteAt(RPS.Y(), 218, 150);
+        LCD.WriteAt("Heading: ", 50, 200);
+        LCD.WriteAt(RPS.Heading(), 218, 200);
+        Sleep(0.1);
+    }*/
+
 
     Sleep(0.2);
     Point jack_side = getCoordinates("Side of Jack", r, 0, 0);
@@ -156,7 +179,6 @@ int main(void){
 
     //Turn to correct angle for Jack
     r.waitTurnToAngle(PI, turn_power, 0.07);
-    r.pulseAngle(PI, turn_power, 0.07);
 
     r.waitMoveToLocation(jack_side, move_power, 0.58);
     r.stopAll();
@@ -168,9 +190,9 @@ int main(void){
     //Wrench
     r.waitMoveToLocation(wrench, move_power, 0.4);
     //r.waitTurnToAngle(PI/2, turn_power, 0.05);
-    r.waitTurnToAngle(heading_1 + PI/2, turn_power - 5, 0.09);
+    r.waitTurnToAngle(heading_1 + PI/2, turn_power - 5, 0.03);
     //r.pulseAngle(PI/2, turn_power*LOWEST, 0.05);
-    r.pulseAngle(heading_1 + PI/2 - 0.02, turn_power - 5, 0.02);
+    //r.pulseAngle(heading_1 + PI/2 - 0.02, turn_power - 5, 0.02);
     r.wrench.SetDegree(103);
     r.waitFor(0.1);
     r.goAndStop(PI/2, wrench_power, 0.57, 1);
@@ -179,18 +201,18 @@ int main(void){
 
     //Grass Ramp
     r.waitMoveToLocation(grass_ramp, move_power, 0.5);
-    r.waitTurnToAngle(PI/4 - 0.05, 35, 0.1);
-    r.moveAtAngle(PI/4 - 0.05, big_speed + 15);
+    r.waitTurnToAngle(PI/4, 35, 0.1);
+    r.moveAtAngle(PI/4 - 0.1, big_speed + 25);
     r.waitFor(3.05);
 
     //Garage
-    r.waitMoveToLocation(by_garage, max_speed, 0.5);
-    r.pulse(by_garage, move_power, 0.25);
+    r.waitMoveToLocation(by_garage, max_speed, 0.6);
+    r.pulse(by_garage, 15, 0.25);
     //r.waitTurnToAngle(PI/4 - 0.14, turn_power - 5, 0.08);
     r.waitTurnToAngle(heading_2 + PI/4 - 0.04, turn_power, 0.05);
     r.goAndStop(PI/2, big_speed, 1, 1);
     r.wrench.SetDegree(110);
-    r.waitFor(0.5);
+    r.waitFor(0.4);
 
     //Back out Diagonally
     r.goAndStop(-PI/4, big_speed + 10, 1, 1);
@@ -210,8 +232,8 @@ int main(void){
     r.waitTurnToAngle(heading_3 + 3*PI/4 - 0.035, turn_power, 0.05);
 
     //Move to the wheel
-    r.waitMoveToLocation(by_wheel, move_power, 0.2);
-    r.goAndStop(-PI/2, move_power, 0.5, 1);
+    r.waitMoveToLocation(by_wheel, move_power - 5, 0.1);
+    r.goAndStop(-PI/2, move_power + 5, 0.5, 1);
 
     //Turn the fuel pump
     r.wheel.SetDegree(90);
@@ -221,31 +243,26 @@ int main(void){
     } else {
         r.wheel.SetDegree(0);
     }
-    r.waitFor(0.25);
+    r.waitFor(0.2);
 
     //End
-    r.goAndStop(3*PI/4 - 0.05, big_speed + 10, 0.5);
-    r.waitFor(0.3);
+    r.goAndStop(3*PI/4 - 0.07, big_speed + 20, 0.6);
     r.waitMoveToLocation(by_garage_2, move_power, 2);
 
     //Move to top of ramp
-    r.goAndStop(PI, big_speed + 20, 0.45);
-    r.waitFor(0.3);
+    r.goAndStop(PI, max_speed, 0.5);
     r.waitMoveToLocation(top_ramp, move_power, 2);
 
     //Move to bottom of ramp
-    r.goAndStop(3*PI/4, max_speed, 0.57);
-    r.waitFor(0.3);
+    r.goAndStop(3*PI/4 + 0.03, max_speed - 5, 0.7);
     r.waitMoveToLocation(bottom_ramp, move_power, 1.5);
 
     //Move to before the end
-    r.goAndStop(PI/4 - 0.2, big_speed + 25, 0.62);
-    r.waitFor(0.3);
+    r.goAndStop(PI/4 - 0.2, big_speed + 25, 0.66);
     r.waitMoveToLocation(before_end, move_power);
 
     //Turn and move to end
     //r.waitTurnToAngle(PI, turn_power, 0.3);
+    //r.waitTurnToAngle(PI/4, turn_power, 0.35);
     r.waitMoveToLocation(end, big_speed);
-
-    //LCD.WriteAt("We did it (maybe)!", 0, 0);
 }

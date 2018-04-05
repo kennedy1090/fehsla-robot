@@ -140,7 +140,7 @@ void Robot::setMotor(Motors m, float percent) {
         bottom.SetPercent(percent);
         break;
     case LEFT:
-        left.SetPercent(1.3*percent);
+        left.SetPercent(percent);
         break;
     }
 }
