@@ -2,6 +2,7 @@
 #include <FEHIO.h>
 #include <FEHUtility.h>
 #include <FEHMotor.h>
+#include <FEHBattery.h>
 
 #include "tests.h"
 
@@ -36,7 +37,7 @@ Point getCoordinates(char* name, Robot r, bool heading, int number) {
 
     if (number == 1)
     {
-       p.y = p.y + 0.5;
+       p.y = p.y + 0.25;
     }
 
     return p;
@@ -45,12 +46,17 @@ Point getCoordinates(char* name, Robot r, bool heading, int number) {
 
 int main(void){
 
+    /*while(true)
+    {
+        LCD.WriteLine(Battery.Voltage());
+    }*/
+
     //Point jack_side = {12, 12.3};
 
     //Point wrench = {9.13, 16.4};
 
     //Point by_start = {17.5, 19};
-    Point before_end = {17.5, 21.5};
+    Point before_end = {17.5 - 0.5, 21.5};
     Point end = {17.5, 40};
 
     Point white_button = {25.8, 20};
@@ -118,14 +124,24 @@ int main(void){
     Sleep(0.25);
     LCD.Clear();
 
-    int pulse_angle_speed = 20;
-    int pulse_location_speed =20;
+    int pulse_angle_speed = 18;
+    int pulse_location_speed = 25;
     int turn_power = 42;
 
-    int wrench_power = 40;
-    int move_power = 60;
+    int wrench_power = 43;
+    int move_power;
+
+    if(RPS.CurrentCourse() == 1)
+    {
+        move_power = 47;
+    }
+    else
+    {
+        move_power = 55;
+    }
+
     int move_power_2 = 70;
-    int max_speed = 100;
+    int max_speed = 95;
     int diagonal_max_speed = 140;
 
     //Initialize servos
@@ -160,7 +176,7 @@ int main(void){
 
     //red
     if(r.cds.Value() < colorBoundary) {
-        r.goAndStop(PI/4, move_power_2 - 5, 0.557);
+        r.goAndStop(PI/4 + 0.04, move_power_2 - 5, 0.557);
         r.goAndStop(3*PI/2, move_power_2, 0.25);
 
         //Move to jack
@@ -175,12 +191,12 @@ int main(void){
 
         r.waitFor(0.1);
         //Move a little extra
-        r.goAndStop(0, max_speed, 0.5);
+        r.goAndStop(0, max_speed, 0.39);
         r.waitFor(0.1);
 
         //Move to jack
         r.waitTurnToAngle(PI, turn_power - 5, 0.1);
-        r.goAndStop(0.15, max_speed, 0.45);
+        r.goAndStop(0.1, max_speed, 0.6);
     }
 
     //---------------Jack---------------
@@ -190,9 +206,9 @@ int main(void){
     r.goAndStop(PI/2, max_speed, 0.2);
 
     //Turn to correct angle for Jack
-    r.waitTurnToAngle(PI, turn_power, 0.07);
+    r.pulseAngle(PI, pulse_angle_speed, 0.05);
 
-    r.waitMoveToLocation(jack_side, move_power, 0.5);
+    r.waitMoveToLocation(jack_side, move_power, 0.4);
     r.stopAll();
 
     //Back up while raising the servo angle
@@ -200,15 +216,13 @@ int main(void){
     r.goAndStop(3*PI/2, max_speed, 0.07);
 
     //---------------Wrench---------------
+    r.goAndStop(-PI/4, move_power_2, 0.12);
     r.waitMoveToLocation(wrench, move_power, 0.4);
-    //r.waitTurnToAngle(PI/2, turn_power, 0.05);
-    r.blindTurn(PI/2, 90, 0.38);
+    r.blindTurn(0, 90, 0.38);
     r.stopAll();
     r.waitFor(0.1);
 
-    //r.waitTurnToAngle(heading_1 + PI/2, turn_power - 10, 0.02);
-    //r.pulseAngle(PI/2, turn_power*LOWEST, 0.05);
-    r.pulseAngle(heading_1 + PI/2, pulse_angle_speed, 0.02);
+    r.pulseAngle(heading_1 + PI/2, pulse_angle_speed, 0.045);
     r.wrench.SetDegree(103);
     r.waitFor(0.1);
     r.goAndStop(PI/2, wrench_power, 0.57, 1);
@@ -217,21 +231,21 @@ int main(void){
 
     //---------------Grass Ramp---------------
     r.waitMoveToLocation(grass_ramp, move_power - 5, 0.6);
-    r.waitTurnToAngle(PI/4, turn_power - 15, 0.05);
-    r.moveAtAngle(PI/4, diagonal_max_speed - 10);
-    r.waitFor(1.45);
+    r.waitTurnToAngle(PI/4, turn_power - 15, 0.06);
+    r.moveAtAngle(PI/4 - 0.02, diagonal_max_speed - 30);
+    r.waitFor(1.8);
 
     //---------------Garage---------------
-    r.waitMoveToLocation(by_garage, move_power + 10, 0.4);
-    //r.pulse(by_garage, 15, 0.25);
-    //r.waitTurnToAngle(PI/4 - 0.14, turn_power - 5, 0.08);
+    r.waitMoveToLocation(by_garage, move_power + 10, 1);
+    r.pulse(by_garage, pulse_location_speed, 1);
+
     r.waitTurnToAngle(heading_2 + PI/4 - 0.04, turn_power, 0.06);
-    r.goAndStop(PI/2, max_speed - 10, 0.8, 1);
+    r.goAndStop(PI/2, max_speed - 5, 0.8, 1);
     r.wrench.SetDegree(110);
     r.waitFor(0.45);
 
     //Back out Diagonally
-    r.goAndStop(-PI/4 - 0.25, max_speed, 0.9, 1);
+    r.goAndStop(-PI/4 - 0.25, max_speed, 0.95, 1);
     r.wrench.SetDegree(0);
 
     //Checks the fuel type
@@ -244,20 +258,19 @@ int main(void){
     //---------------Wheel---------------
 
     //Turns robot to correct angle
-    //r.waitTurnToAngle(3*PI/4 - 0.035, turn_power, 0.05);
 
     //Move to the wheel
-    r.waitMoveToLocation(by_wheel, move_power - 10, 0.7);
-    r.pulse(by_wheel, pulse_location_speed, 0.1);
-    //r.goAndStop(PI, move_power - 20, 0.6, 1);
+    r.waitMoveToLocation(by_wheel, move_power - 10, 1);
+    r.pulse(by_wheel, pulse_location_speed + 5, 0.2);
+
 
     //Adjust the angle
-    //r.waitTurnToAngle(heading_3 + 3*PI/4 - 0.035, turn_power - 5, 0.04);
-    r.blindTurn(PI/2, 90, 0.38);
-    r.pulseAngle(heading_3 + 3*PI/4 - 0.035, pulse_angle_speed, 0.04);
+
+    r.blindTurn(1, 90, 0.355);
+    r.pulseAngle(heading_3 + 3*PI/4 - 0.035, pulse_angle_speed, 0.03);
 
     //Run into the fuel pump
-    r.goAndStop(-PI/2, move_power + 5, 0.5, 1);
+    r.goAndStop(-PI/2, move_power + 5, 0.47, 1);
 
     //Turn the servo for the fuel pump
     r.wheel.SetDegree(90);
@@ -270,23 +283,22 @@ int main(void){
     r.waitFor(0.2);
 
     //---------------End---------------
-    r.goAndStop(3*PI/4 - 0.07, max_speed, 0.4);
-    r.waitMoveToLocation(by_garage_2, move_power, 2);
+    r.goAndStop(3*PI/4 - 0.15, max_speed, 0.5);
+    r.waitMoveToLocation(by_garage_2, move_power + 10, 1.9);
 
     //Move to top of ramp
-    r.goAndStop(PI, max_speed, 0.33);
-    r.waitMoveToLocation(top_ramp, move_power-7, 1.8);
+    r.goAndStop(PI, max_speed, 0.345);
+    r.waitMoveToLocation(top_ramp, move_power - 7, 1.9);
 
     //Move to bottom of ramp
-    r.goAndStop(3*PI/4 + 0.03, diagonal_max_speed - 20, 0.6);
-    r.waitMoveToLocation(bottom_ramp, move_power-10, 1);
+    r.goAndStop(3*PI/4 + 0.03, diagonal_max_speed - 30, 0.9);
+    r.waitMoveToLocation(bottom_ramp, move_power-10, 1.5);
 
     //Move to before the end
-    r.goAndStop(PI/4 - 0.1, max_speed + 20, 0.35);
-    r.waitMoveToLocation(before_end, move_power);
+    r.goAndStop(PI/4 - 0.1, max_speed + 20, 0.5);
+    r.waitMoveToLocation(before_end, move_power + 10, 1.5);
 
     //Turn and move to end
-    //r.waitTurnToAngle(PI, turn_power, 0.3);
-    r.waitTurnToAngle(PI/2, turn_power + 6.5, 0.3);
-    r.waitMoveToLocation(end, max_speed);
+    r.blindTurn(0, 90, 0.195);
+    r.goAndStop(0, max_speed, 2);
 }

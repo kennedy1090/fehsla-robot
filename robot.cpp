@@ -30,10 +30,9 @@ Robot::Robot(bool rps) :
         //SD.Printf("Time, X, Y, Angle, Vx, Vy, estX, estY, travel angle\n");
     }
 }
-void Robot::blindTurn(float angle, float percent, float time){
+void Robot::blindTurn(bool ccw, float percent, float time){
     if(kill)return;
-    bool pos = (angle > currentAngle && angle - currentAngle < 3.1415) || (currentAngle > angle && currentAngle - angle  > 3.1415);
-    int sign = pos * 2 - 1;
+    int sign = ccw * 2 - 1;
     setMotor(RIGHT, sign * percent);
     setMotor(LEFT, -sign * percent);
     setMotor(TOP, -sign * percent);
@@ -264,8 +263,12 @@ void Robot::pulseAngle(float angle, float percent, float tolerance) {
  *              returns when pin is greater than threshold.
  */
 void Robot::waitForPin(AnalogInputPin pin, float threshold, bool lessThan) {
+    float time = TimeNow();
     while(!kill && ((pin.Value() < threshold) != lessThan)){
+        LCD.WriteRC(pin.Value(), 0, 0);
         if(!killswitch.Value())kill = true;
+        if(TimeNow() - time > 30)
+            return;
     }
 }
 

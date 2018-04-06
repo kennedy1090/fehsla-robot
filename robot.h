@@ -23,7 +23,7 @@
 #define POSITION_TOLERANCE 0.5
 #define POS2 5
 
-#define PULSE_TIME 0.17
+#define PULSE_TIME 0.11
 
 #define LOWEST 0.4
 
@@ -57,7 +57,7 @@ public:
     void setMotor(Motors m, float percent);
 
     void goAndStop(float angle, float percent, float time, bool stop = 0);
-    void blindTurn(float angle, float percent, float time);
+    void blindTurn(bool ccw, float percent, float time);
 
     void stop(Motors m);
     void stopAll();
