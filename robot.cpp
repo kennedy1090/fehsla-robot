@@ -30,6 +30,17 @@ Robot::Robot(bool rps) :
         //SD.Printf("Time, X, Y, Angle, Vx, Vy, estX, estY, travel angle\n");
     }
 }
+void Robot::blindTurn(float angle, float percent, float time){
+    if(kill)return;
+    bool pos = (angle > currentAngle && angle - currentAngle < 3.1415) || (currentAngle > angle && currentAngle - angle  > 3.1415);
+    int sign = pos * 2 - 1;
+    setMotor(RIGHT, sign * percent);
+    setMotor(LEFT, -sign * percent);
+    setMotor(TOP, -sign * percent);
+    setMotor(BOTTOM, sign * percent);
+
+    waitFor(time);
+}
 
 void Robot::goAndStop(float angle, float percent, float time, bool stop){
     moveAtAngle(angle, percent);

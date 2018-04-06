@@ -23,9 +23,9 @@
 #define POSITION_TOLERANCE 0.5
 #define POS2 5
 
-#define PULSE_TIME 0.2
+#define PULSE_TIME 0.17
 
-#define LOWEST 0.3
+#define LOWEST 0.4
 
 #define KILLSWITCH_PIN FEHIO::P1_0
 #define CDS_PIN FEHIO::P0_0
@@ -49,6 +49,7 @@ class Robot
 public:
     Robot(bool rps);
     //Angles are in radians
+
     void moveAtAngle(float angle, float percent);
     void turn(float angle, float percent, bool slow);
     void moveToLocation(Point pos, float percent, bool slow);
@@ -56,6 +57,7 @@ public:
     void setMotor(Motors m, float percent);
 
     void goAndStop(float angle, float percent, float time, bool stop = 0);
+    void blindTurn(float angle, float percent, float time);
 
     void stop(Motors m);
     void stopAll();

@@ -1,2 +1,2 @@
    text	   data	    bss	    dec	    hex	filename
-  58728	   3420	   6132	  68280	  10ab8	../fehsla-robot.elf
+  72636	   3420	   6136	  82192	  14110	../fehsla-robot.elf
