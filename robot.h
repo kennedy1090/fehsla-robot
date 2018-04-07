@@ -28,7 +28,7 @@
 #define LOWEST 0.4
 
 #define KILLSWITCH_PIN FEHIO::P1_0
-#define CDS_PIN FEHIO::P0_0
+#define CDS_PIN FEHIO::P0_7
 
 #define WRENCH_MIN 500
 #define WRENCH_MAX 2377

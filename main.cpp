@@ -2,17 +2,20 @@
 #include <FEHIO.h>
 #include <FEHUtility.h>
 #include <FEHMotor.h>
-#include <FEHBattery.h>
 
 #include "tests.h"
 
+//function for getting coordinates manually
 Point getCoordinates(char* name, Robot r, bool heading, int number) {
     LCD.Clear();
     LCD.WriteAt(name, 100, 100);
     float x, y;
     Point p;
+
+    //When the screen is touched, save current RPS values and heading to the robot.
     while(!LCD.Touch(&x, &y)){
 
+        //Save the three different headings
         if (heading == 1){
             switch (number)
             {
@@ -29,72 +32,58 @@ Point getCoordinates(char* name, Robot r, bool heading, int number) {
                 break;
             }
         }
+
+        //Run the function to get RPS values
         r.updateLocation();
     }
 
+    //Set the values in the struct to the values determined by RPS
     p.x = RPS.X();
     p.y = RPS.Y();
 
+    //Set a small offset for the first value obtained
     if (number == 1)
     {
-       p.y = p.y + 0.25;
+        p.y = p.y + 0.25;
     }
 
+    //Return the struct Point
     return p;
 }
 
-
+//Start main
 int main(void){
 
-    /*while(true)
-    {
-        LCD.WriteLine(Battery.Voltage());
-    }*/
-
-    //Point jack_side = {12, 12.3};
-
-    //Point wrench = {9.13, 16.4};
-
-    //Point by_start = {17.5, 19};
+    //Declare the RPS points
     Point before_end = {17.5 - 0.5, 21.5};
-    Point end = {17.5, 40};
 
-    Point white_button = {25.8, 20};
+    Point white_button = {25.8, 20 + 0.7};
+    Point white_button_2 = {25.8, 20};
 
     Point bottom_ramp = {28.5, 21.5};
     Point top_ramp = {30, 41.7};
 
-    //Point by_garage = {16.5, 55};
     Point by_garage_2 = {23.5, 47.8};
-
-    //Point by_wheel = {25.9 , 60.4};
 
     Point grass_ramp = {5, 23};
 
+    //Extra RPS points
+    //Point by_start = {17.5, 19};
+    //Point by_garage = {16.5, 55};
+    //Point by_wheel = {25.9 , 60.4};
+
+    //Set the color boundary and blank heading values
     float colorBoundary = 1;
     float x,y, heading_1, heading_2, heading_3;
 
-
     Robot r(true);
 
-    /*while(true)
-    {
-    LCD.WriteAt("Cds Value: ", 50, 50);
-        LCD.WriteAt(r.cds.Value(), 218, 50);
-        LCD.WriteAt("X-Value: ", 50, 100);
-        LCD.WriteAt(RPS.X(), 218, 100);
-        LCD.WriteAt("Y-Value: ", 50, 150);
-        LCD.WriteAt(RPS.Y(), 218, 150);
-        LCD.WriteAt("Heading: ", 50, 200);
-        LCD.WriteAt(RPS.Heading(), 218, 200);
-        Sleep(0.1);
-    }*/
-
+    //Touch the screen to take in RPS values and headings
     LCD.WriteAt("Touch the Screen!", 0, 100);
     while(!LCD.Touch(&x, &y));
     LCD.Clear();
-
     Sleep(0.1);
+
     Point jack_side = getCoordinates("Side of Jack", r, 0, 0);
     LCD.Clear();
     LCD.WriteAt("Saved!", 100, 100);
@@ -119,21 +108,25 @@ int main(void){
     Sleep(0.2);
     LCD.WriteAt("Touch the Screen to Start!", 0, 100);
     while(!LCD.Touch(&x, &y));
+
     LCD.Clear();
-    LCD.WriteAt("Ready", 100,100);
-    Sleep(0.25);
+    LCD.WriteAt("Ready", 100, 100);
+    Sleep(0.2);
     LCD.Clear();
 
+    //Set the motor speeds
     int pulse_angle_speed = 18;
     int pulse_location_speed = 25;
+
     int turn_power = 42;
 
     int wrench_power = 43;
     int move_power;
 
+    //If the robot runs on course a-d, lower the speed
     if(RPS.CurrentCourse() == 1)
     {
-        move_power = 47;
+        move_power = 48;
     }
     else
     {
@@ -158,11 +151,19 @@ int main(void){
 
     //Adjust to the exact position
     r.waitMoveToLocation(white_button, move_power - 5);
+    r.pulse(white_button_2, pulse_location_speed, 0.2);
     r.waitTurnToAngle(PI - 0.05, turn_power, 0.1);
     r.waitFor(0.05);
 
     //drive into RPS button
     r.goAndStop(PI/2, move_power, 0.27, 1);
+    r.waitFor(0.2);
+
+    while(RPS.IsDeadzoneActive() == 0) {
+       r.goAndStop(3*PI/2, move_power, 0.27);
+       r.pulseAngle(PI - 0.05, pulse_angle_speed, 0.05);
+       r.goAndStop(PI/2, move_power, 0.3);
+    }
 
     //Makes sure RPS is on
     while(RPS.IsDeadzoneActive() != 2) {
@@ -181,7 +182,7 @@ int main(void){
 
         //Move to jack
         r.waitTurnToAngle(PI, turn_power - 5, 0.1);
-        r.goAndStop(0.2, max_speed, 0.6);
+        r.goAndStop(0.2, max_speed, 0.65);
     }
 
     //blue
@@ -196,7 +197,7 @@ int main(void){
 
         //Move to jack
         r.waitTurnToAngle(PI, turn_power - 5, 0.1);
-        r.goAndStop(0.1, max_speed, 0.6);
+        r.goAndStop(0.1, max_speed, 0.63);
     }
 
     //---------------Jack---------------
@@ -209,6 +210,7 @@ int main(void){
     r.pulseAngle(PI, pulse_angle_speed, 0.05);
 
     r.waitMoveToLocation(jack_side, move_power, 0.4);
+    r.pulse(jack_side, pulse_location_speed, 0.3);
     r.stopAll();
 
     //Back up while raising the servo angle
@@ -218,11 +220,11 @@ int main(void){
     //---------------Wrench---------------
     r.goAndStop(-PI/4, move_power_2, 0.12);
     r.waitMoveToLocation(wrench, move_power, 0.4);
-    r.blindTurn(0, 90, 0.38);
+    r.blindTurn(0, 90, 0.375);
     r.stopAll();
     r.waitFor(0.1);
 
-    r.pulseAngle(heading_1 + PI/2, pulse_angle_speed, 0.045);
+    r.pulseAngle(heading_1 + PI/2 - 0.03, pulse_angle_speed, 0.04);
     r.wrench.SetDegree(103);
     r.waitFor(0.1);
     r.goAndStop(PI/2, wrench_power, 0.57, 1);
